@@ -3,142 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIRAL - Ultra Crystal Final</title>
+    
+    <title>VIRAL - Ultra Crystal Ultimate</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        :root { --accent: #ff003c; --bg-main: #020202; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #1a0505, var(--bg-main));
-            color: white; 
-            overflow-x: hidden; 
-            padding-bottom: 120px;
-            scroll-behavior: smooth;
-        }
+        :root { --accent: #ff003c; --accent-glow: rgba(255, 0, 60, 0.5); --bg-main: #000; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: white; overflow-x: hidden; padding-bottom: 120px; transition: 0.5s; }
 
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .glass-dark { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-ultra { background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(25px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-dark { background: rgba(0, 0, 0, 0.2) !important; backdrop-filter: blur(30px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-        /* Banner Slider */
-        #heroSlider { position: relative; height: 55vh; width: 100%; overflow: hidden; border-radius: 0 0 40px 40px; }
-        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease-in-out; }
+        #heroSlider { height: 42vh; overflow: hidden; border-radius: 0 0 35px 35px; position: relative; }
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
         .slide.active { opacity: 1; }
 
-        /* Tab Menu */
-        .tab-item { transition: all 0.3s ease; position: relative; }
-        .tab-item.active { color: var(--accent); font-weight: 800; }
-        .tab-item.active::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
+        .movie-card { border-radius: 20px; overflow: hidden; background: #0a0a0a; position: relative; box-shadow: 0 10px 20px -10px var(--accent-glow); transition: 0.3s; }
+        .preview-box { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s; z-index: 5; background: #000; }
+        .movie-card:hover .preview-box { opacity: 1; }
+        .preview-box.has-played { opacity: 0.4; } 
+        video.preview-vid { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Card System */
-        .movie-card { border-radius: 20px; overflow: hidden; position: relative; transition: all 0.5s ease; background: rgba(255,255,255,0.02); }
-        .movie-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255,0,60,0.1); }
-        .preview-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; pointer-events: none; }
-        .movie-card:hover .preview-video { opacity: 1; }
+        .tab-item { color: rgba(255,255,255,0.3); font-weight: 800; transition: 0.2s; padding: 8px 12px; }
+        .tab-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
-        .click-scale { transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .click-scale:active { transform: scale(0.92); }
-
-        #searchWrapper { transition: all 0.5s ease; border-radius: 50px; z-index: 110; }
-        #searchWrapper.active { width: 220px; background: rgba(255,255,255,0.1); padding: 5px 15px; }
-
+        .btn-resp { transition: 0.1s; cursor: pointer; }
+        .btn-resp:active { transform: scale(0.85); }
+        .theme-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
+        
+        .badge-new { position: absolute; top: 10px; left: 10px; z-index: 30; background: var(--accent); color: white; font-size: 8px; font-weight: 900; padding: 3px 8px; border-radius: 5px; box-shadow: 0 0 15px var(--accent-glow); text-transform: uppercase; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-    <nav class="fixed top-0 w-full z-[150] px-6 py-4 flex items-center justify-between glass-dark">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center animate-pulse">
-                <i class="fa fa-play text-white text-[10px]"></i>
+    <nav class="fixed top-0 w-full z-[1000] px-6 py-4 flex items-center justify-between glass-dark">
+        <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[var(--accent)] rounded-lg flex items-center justify-center shadow-lg shadow-[var(--accent-glow)]">
+                    <i class="fa fa-play text-white text-[10px]"></i>
+                </div>
+                <h1 class="text-xl font-extrabold italic tracking-tighter">VIRAL<span class="text-[var(--accent)]">.</span></h1>
             </div>
-            <h1 class="text-xl font-extrabold tracking-tighter uppercase italic">VIRAL<span class="text-red-600">.</span></h1>
+            <div class="flex gap-2 mt-2">
+                <div onclick="setTheme('#ff003c')" class="theme-dot bg-[#ff003c]"></div>
+                <div onclick="setTheme('#007aff')" class="theme-dot bg-[#007aff]"></div>
+                <div onclick="setTheme('#34c759')" class="theme-dot bg-[#34c759]"></div>
+                <div onclick="setTheme('#ffcc00')" class="theme-dot bg-[#ffcc00]"></div>
+            </div>
         </div>
-        
-        <div id="searchWrapper" class="flex items-center h-10 w-10 justify-center">
-            <button onclick="toggleSearch()" class="text-white/70 hover:text-white click-scale"><i class="fa fa-search"></i></button>
-            <input type="text" id="searchInput" placeholder="Cari konten..." class="hidden bg-transparent border-none outline-none ml-2 text-sm w-full text-white">
+        <div class="glass-ultra px-4 py-2 rounded-full flex items-center">
+            <i class="fa fa-search text-white/20 mr-2 text-xs"></i>
+            <input type="text" id="searchInput" placeholder="Cari..." class="bg-transparent border-none outline-none text-xs w-20 focus:w-32 transition-all text-white">
         </div>
     </nav>
 
-    <section id="heroSlider" class="mb-6 shadow-2xl z-10"></section>
+    <section id="heroSlider" class="mb-4"></section>
 
-    <div class="px-6 mb-8 flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest overflow-x-auto no-scrollbar relative z-20">
-        <button onclick="filterTab('all', this)" class="tab-item active whitespace-nowrap">All Videos</button>
-        <button onclick="filterTab('trending', this)" class="tab-item whitespace-nowrap text-white/40">Trending</button>
-        <button onclick="filterTab('latest', this)" class="tab-item whitespace-nowrap text-white/40">Latest Post</button>
+    <div class="px-6 mb-6 flex items-center gap-6 overflow-x-auto no-scrollbar bg-transparent">
+        <button onclick="changeTab('all', this)" class="tab-item active btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Semua</button>
+        <button onclick="changeTab('trending', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Trending</button>
+        <button onclick="changeTab('history', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Riwayat</button>
     </div>
 
-    <main class="px-6 md:px-16 relative z-10">
-        <div class="flex justify-between items-center mb-6">
-            <h2 id="tabTitle" class="text-2xl font-black uppercase">All Collection</h2>
-            <div id="videoCount" class="glass px-4 py-1.5 rounded-full text-[10px] font-bold opacity-60">0 Items</div>
+    <main class="px-5">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="tabTitle" class="text-xl font-black uppercase italic tracking-tighter">Collection</h2>
+            <div id="videoCount" class="text-[9px] font-bold opacity-30 tracking-widest uppercase">0 items</div>
         </div>
-        <div id="movieGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+        <div id="movieGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </main>
 
-    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-lg h-20 glass rounded-[35px] flex justify-around items-center z-[500] border-white/10 shadow-2xl">
-        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-red-600 click-scale">
-            <i class="fa fa-house-chimney text-xl"></i>
-            <span class="text-[9px] font-bold mt-1 uppercase">Home</span>
-        </button>
-        <button onclick="openUploadModal()" class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-red-600/40 click-scale -translate-y-6 border-4 border-[#020202]">
-            <i class="fa fa-plus text-2xl"></i>
-        </button>
-        <button onclick="window.toggleModal('guideModal')" class="flex flex-col items-center text-white/40 click-scale">
-            <i class="fa fa-circle-info text-xl"></i>
-            <span class="text-[9px] font-bold mt-1 uppercase">Help</span>
-        </button>
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm h-16 glass-ultra rounded-full flex justify-around items-center z-[1100]">
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="btn-resp text-white/40"><i class="fa fa-house text-lg"></i></button>
+        <button onclick="openUploadModal()" class="btn-resp w-12 h-12 bg-[var(--accent)] rounded-full flex items-center justify-center text-white shadow-lg -translate-y-4 border-4 border-black"><i class="fa fa-plus text-xl"></i></button>
+        <button onclick="toggleModal('guideModal')" class="btn-resp text-white/40"><i class="fa fa-circle-info text-lg"></i></button>
     </div>
 
-    <div id="guideModal" class="fixed inset-0 z-[600] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-3xl">
-        <div class="glass w-full max-w-lg p-8 rounded-[40px] relative">
-            <button onclick="window.toggleModal('guideModal')" class="absolute top-6 right-6 text-xl text-white/50">&times;</button>
-            <h2 class="text-2xl font-black mb-6 uppercase text-red-600">Panduan Post</h2>
-            <div class="space-y-4 text-sm text-gray-300 text-left">
-                <p>1. Masuk link ini Catbox.moe klick select of drop files nanti bakal masuk ke file, pilih video yg mau di post lalu tunggu beberapa detik sampai muncul link tersebut lalu salin</p>
-                <p>2. untuk link thumbail, ss video yg kalian post lalu ulangin step awal seperti di atas dan salin link lalu upload</p>
-                <p>3. Pastikan link thumbnail adalah link gambar langsung.</p>
-            </div>
-            <button onclick="window.toggleModal('guideModal')" class="w-full py-4 mt-6 bg-red-600 rounded-2xl font-bold uppercase click-scale">Mengerti</button>
-        </div>
-    </div>
-
-    <div id="uploadModal" class="fixed inset-0 z-[600] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-3xl">
-        <div class="glass w-full max-w-xl p-8 rounded-[40px] relative animate__animated animate__fadeInUp">
-            <button onclick="window.toggleModal('uploadModal')" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full glass hover:bg-red-600 transition-colors">&times;</button>
-            <h2 id="modalHeadTitle" class="text-2xl font-black mb-6 uppercase">New <span class="text-red-600">Content</span></h2>
-            <form id="movieForm" class="space-y-4">
+    <div id="uploadModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-6 bg-black/40 backdrop-blur-2xl">
+        <div class="glass-ultra w-full max-w-md p-8 rounded-[40px]">
+            <h2 id="modalHeadTitle" class="text-xl font-black mb-6 uppercase italic">Post <span class="text-[var(--accent)]">Video</span></h2>
+            <form id="movieForm" class="space-y-3">
                 <input type="hidden" id="editId">
-                <input type="text" id="upTitle" placeholder="Judul" class="w-full glass p-5 rounded-2xl outline-none text-sm" required>
-                <textarea id="upDesc" placeholder="Deskripsi..." class="w-full glass p-5 rounded-2xl outline-none h-24 text-sm" required></textarea>
-                <input type="url" id="upLink" placeholder="Link Video (.mp4)" class="w-full glass p-5 rounded-2xl outline-none text-sm" required>
-                <input type="url" id="upThumb" placeholder="Link Thumbnail" class="w-full glass p-5 rounded-2xl outline-none text-sm">
-                <button type="submit" id="submitBtn" class="w-full py-5 bg-red-600 rounded-2xl font-black uppercase shadow-xl shadow-red-600/30 click-scale">Publish</button>
+                <input type="text" id="upTitle" placeholder="Judul Video" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white" required>
+                <input type="url" id="upLink" placeholder="Link .mp4" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white" required>
+                <input type="url" id="upThumb" placeholder="Link Thumbnail" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white" required>
+                <div class="flex gap-3 mt-4">
+                    <button type="submit" id="submitBtn" class="btn-resp flex-1 py-3 bg-[var(--accent)] rounded-xl font-black text-xs uppercase shadow-lg shadow-[var(--accent-glow)]">PUBLISH</button>
+                    <button type="button" onclick="toggleModal('uploadModal')" class="btn-resp px-6 py-3 bg-white/10 rounded-xl font-bold text-[10px]">BATAL</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <div id="videoModal" class="fixed inset-0 z-[700] hidden flex-col items-center justify-center bg-black/90 backdrop-blur-2xl p-4">
-        <div class="w-full max-w-4xl animate__animated animate__zoomIn">
-            <div class="flex justify-between items-center mb-4 px-2">
-                <h4 id="playingTitle" class="text-lg font-bold truncate"></h4>
-                <div class="flex gap-2">
-                    <button onclick="shareFromPlayer()" class="w-10 h-10 glass rounded-full flex items-center justify-center text-emerald-500 click-scale"><i class="fa fa-share-nodes"></i></button>
-                    <button onclick="window.closePlayer()" class="px-6 py-2 glass rounded-full text-xs font-bold uppercase hover:bg-red-600 click-scale">Tutup</button>
-                </div>
+    <div id="videoModal" class="fixed inset-0 z-[3000] hidden bg-black/90 flex-col items-center justify-center p-4 backdrop-blur-3xl">
+        <div class="w-full max-w-4xl">
+            <div class="flex justify-between items-center mb-3">
+                <h4 id="playingTitle" class="font-bold truncate text-sm italic px-2"></h4>
+                <button onclick="closePlayer()" class="btn-resp px-4 py-1.5 bg-[var(--accent)] rounded-full text-[10px] font-black uppercase">CLOSE</button>
             </div>
-            <div class="relative pt-[56.25%] bg-black rounded-[30px] overflow-hidden border border-white/10 shadow-2xl">
-                <video id="mainPlayer" class="absolute inset-0 w-full h-full" controls autoplay></video>
-            </div>
+            <video id="mainPlayer" class="w-full rounded-[25px] shadow-2xl" controls autoplay></video>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <div id="guideModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-8 bg-black/40 backdrop-blur-2xl">
+        <div class="glass-ultra w-full max-w-xs p-8 rounded-[40px]">
+            <h2 class="text-xl font-black mb-4 text-[var(--accent)] italic uppercase">Informasi</h2>
+            <div class="space-y-4 text-[12px] text-gray-300 leading-relaxed">
+                <p>🚀 <b>Update:</b> Library video bertambah setiap hari.</p>
+                <p>🎬 <b>Fitur:</b> Klik icon pensil untuk edit, sampah untuk hapus.</p>
+                <p>📱 <b>Notif:</b> Dapatkan info video baru secara otomatis.</p>
+            </div>
+            <button onclick="toggleModal('guideModal')" class="btn-resp w-full py-3 mt-6 bg-[var(--accent)] rounded-2xl font-black text-xs">MENGERTI</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -160,187 +144,192 @@
         let cachedMovies = [];
         let currentFilter = 'all';
 
-        // Stabilizer: Modal Control
+        // --- NOTIFIKASI ENGINE ---
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+            background: '#111', color: '#fff', timerProgressBar: true
+        });
+
+        window.onload = () => {
+            setTimeout(() => Toast.fire({ icon: 'success', title: 'Library diupdate setiap hari! Enjoy 🚀' }), 1500);
+        };
+
+        // --- THEME ---
+        window.setTheme = (color) => {
+            document.documentElement.style.setProperty('--accent', color);
+            document.documentElement.style.setProperty('--accent-glow', color + '80');
+            localStorage.setItem('ui-theme', color);
+        };
+        const st = localStorage.getItem('ui-theme'); if(st) setTheme(st);
+
+        // --- FIX HISTORY SYSTEM (BUG FREE) ---
+        const saveHistory = (m) => {
+            if(!m.id || !m.title) return;
+            let history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+            // Filter hanya data valid
+            history = history.filter(h => h.id && h.id !== m.id);
+            history.unshift({id: m.id, title: m.title, thumb: m.thumb, link: m.link});
+            localStorage.setItem('watchHistory', JSON.stringify(history.slice(0, 20)));
+        };
+
+        window.shareNow = (title) => {
+            if (navigator.share) {
+                navigator.share({ title: title, url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                Toast.fire({ icon: 'success', title: 'Link tersalin!' });
+            }
+        };
+
+        // --- CORE FUNCTIONS ---
         window.toggleModal = (id) => {
             const m = document.getElementById(id);
-            if(!m) return;
-            if(m.classList.contains('hidden')) {
-                m.classList.replace('hidden', 'flex');
-            } else {
-                m.classList.replace('flex', 'hidden');
-            }
+            m.classList.toggle('hidden'); m.classList.toggle('flex');
         };
 
         window.openUploadModal = () => {
             document.getElementById('movieForm').reset();
             document.getElementById('editId').value = "";
-            document.getElementById('modalHeadTitle').innerHTML = 'New <span class="text-red-600">Content</span>';
-            document.getElementById('submitBtn').innerText = "Publish";
-            window.toggleModal('uploadModal');
+            document.getElementById('modalHeadTitle').innerHTML = 'Post <span class="text-[var(--accent)]">Video</span>';
+            toggleModal('uploadModal');
         };
 
-        window.toggleSearch = () => {
-            const w = document.getElementById('searchWrapper');
-            const i = document.getElementById('searchInput');
-            w.classList.toggle('active');
-            i.classList.toggle('hidden');
-            if(w.classList.contains('active')) i.focus();
+        window.editThis = (id) => {
+            const m = cachedMovies.find(v => v.id === id);
+            if(!m) return;
+            document.getElementById('editId').value = id;
+            document.getElementById('upTitle').value = m.title;
+            document.getElementById('upLink').value = m.link;
+            document.getElementById('upThumb').value = m.thumb;
+            document.getElementById('modalHeadTitle').innerHTML = 'Edit <span class="text-[var(--accent)]">Content</span>';
+            toggleModal('uploadModal');
         };
 
-        // Filter & Tabs
-        window.filterTab = (type, el) => {
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active', 'text-white'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.add('text-white/40'));
-            el.classList.add('active');
-            el.classList.remove('text-white/40');
-            currentFilter = type;
-            document.getElementById('tabTitle').innerText = type === 'all' ? 'All Collection' : type.toUpperCase();
-            applyFilter();
+        window.deleteThis = (id) => {
+            Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ff003c', background: '#111', color: '#fff' })
+            .then(async (r) => { if(r.isConfirmed) await deleteDoc(doc(db, "movies", id)); });
         };
 
-        const applyFilter = () => {
-            let filtered = [...cachedMovies];
-            if(currentFilter === 'trending') filtered = filtered.slice(0, 5);
-            if(currentFilter === 'latest') filtered = filtered.slice(0, 10);
-            render(filtered);
+        window.playVideo = (id) => {
+            let m = cachedMovies.find(v => v.id === id) || JSON.parse(localStorage.getItem('watchHistory') || '[]').find(v => v.id === id);
+            if(!m) return;
+            document.getElementById('playingTitle').innerText = m.title;
+            const vp = document.getElementById('mainPlayer');
+            vp.src = m.link;
+            vp.play();
+            saveHistory(m);
+            if(document.getElementById('videoModal').classList.contains('hidden')) toggleModal('videoModal');
         };
-
-        // Share Link
-        window.shareLink = (title) => {
-            const url = window.location.href;
-            if (navigator.share) {
-                navigator.share({ title: title, url: url }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(url);
-                Swal.fire({ title: 'Link Website Tersalin!', icon: 'success', toast: true, position: 'top', showConfirmButton: false, timer: 2000 });
-            }
-        };
-
-        window.shareFromPlayer = () => window.shareLink(document.getElementById('playingTitle').innerText);
 
         window.closePlayer = () => {
             const p = document.getElementById('mainPlayer');
             p.pause(); p.src = "";
-            document.getElementById('videoModal').classList.replace('flex', 'hidden');
+            toggleModal('videoModal');
         };
 
-        // Banner Slider
-        onSnapshot(query(moviesCol, orderBy("createdAt", "desc"), limit(5)), (snap) => {
-            const slider = document.getElementById('heroSlider');
-            if(snap.empty) return;
-            slider.innerHTML = '';
-            snap.forEach((docSnap, index) => {
-                const data = docSnap.data();
-                const div = document.createElement('div');
-                div.className = `slide ${index === 0 ? 'active' : ''}`;
-                div.innerHTML = `
-                    <img src="${data.thumb}" class="w-full h-full object-cover brightness-[0.4]">
-                    <div class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 bg-gradient-to-t from-black via-transparent to-transparent">
-                        <h2 class="text-4xl md:text-6xl font-black uppercase mb-4 max-w-3xl">${data.title}</h2>
-                        <button onclick="openHero('${data.link}', '${data.title}')" class="w-fit bg-red-600 px-8 py-3 rounded-full font-bold text-sm click-scale shadow-lg shadow-red-600/30">WATCH NOW</button>
-                    </div>`;
-                slider.appendChild(div);
-            });
-        });
-
-        window.openHero = (link, title) => {
-            document.getElementById('playingTitle').innerText = title;
-            const vp = document.getElementById('mainPlayer');
-            vp.src = link;
-            document.getElementById('videoModal').classList.replace('hidden', 'flex');
-        };
-
-        setInterval(() => {
-            const slides = document.querySelectorAll('.slide');
-            if(slides.length <= 1) return;
-            let current = 0;
-            slides.forEach((s, i) => { if(s.classList.contains('active')) current = i; });
-            slides[current].classList.remove('active');
-            slides[(current + 1) % slides.length].classList.add('active');
-        }, 5000);
-
-        // Grid Rendering
         const render = (data) => {
             const grid = document.getElementById('movieGrid');
             grid.innerHTML = '';
-            document.getElementById('videoCount').innerText = `${data.length} Items`;
+            // Hanya tampilkan jika data valid (mempunyai ID dan Thumbnail)
+            const validData = data.filter(m => m && m.id && m.thumb);
+            document.getElementById('videoCount').innerText = `${validData.length} items`;
 
-            data.forEach((m, i) => {
+            validData.forEach((m) => {
+                const isNew = m.createdAt && (Date.now() - m.createdAt.toMillis() < 24 * 60 * 60 * 1000);
                 const card = document.createElement('div');
-                card.className = "movie-card glass animate__animated animate__fadeInUp";
-                card.style.animationDelay = `${i * 0.05}s`;
+                card.className = "movie-card";
                 card.innerHTML = `
-                    <div class="absolute top-3 left-3 z-[60]">
-                        <button onclick="event.stopPropagation(); window.shareLink('${m.title}')" class="w-8 h-8 rounded-full glass bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-[10px] click-scale"><i class="fa fa-share-nodes"></i></button>
+                    ${isNew ? '<div class="badge-new">NEW</div>' : ''}
+                    <div class="absolute top-2 right-2 z-[40] flex gap-1.5">
+                        <button onclick="event.stopPropagation(); window.shareNow('${m.title}')" class="btn-resp w-7 h-7 bg-black/60 rounded-full text-emerald-400 text-[10px] flex items-center justify-center"><i class="fa fa-paper-plane"></i></button>
+                        <button onclick="event.stopPropagation(); window.editThis('${m.id}')" class="btn-resp w-7 h-7 bg-black/60 rounded-full text-white text-[10px] flex items-center justify-center"><i class="fa fa-pencil"></i></button>
+                        <button onclick="event.stopPropagation(); window.deleteThis('${m.id}')" class="btn-resp w-7 h-7 bg-black/60 rounded-full text-red-500 text-[10px] flex items-center justify-center"><i class="fa fa-trash"></i></button>
                     </div>
-                    <div class="absolute top-3 right-3 flex flex-col gap-2 z-[60]">
-                        <button onclick="event.stopPropagation(); window.editThis('${m.id}', '${m.title}', '${m.desc}', '${m.link}', '${m.thumb}')" class="w-8 h-8 rounded-full glass bg-white/10 flex items-center justify-center text-[10px] hover:bg-blue-600 click-scale"><i class="fa fa-edit"></i></button>
-                        <button onclick="event.stopPropagation(); window.deleteThis('${m.id}')" class="w-8 h-8 rounded-full glass bg-white/10 flex items-center justify-center text-[10px] hover:bg-red-600 click-scale"><i class="fa fa-trash"></i></button>
+                    <img src="${m.thumb}" class="w-full aspect-[3/4] object-cover" onerror="this.src='https://placehold.co/300x400/000/fff?text=No+Image'">
+                    <div class="preview-box" id="pv-${m.id}"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent p-3 flex flex-col justify-end z-[15]">
+                        <h3 class="text-[10px] font-bold truncate uppercase italic">${m.title}</h3>
                     </div>
-                    <img src="${m.thumb}" class="w-full aspect-[2/3] object-cover">
-                    <video class="preview-video" muted playsinline loop><source src="${m.link}" type="video/mp4"></video>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black p-4 flex flex-col justify-end">
-                        <h3 class="font-bold text-[11px] uppercase truncate mb-1">${m.title}</h3>
-                        <div class="flex justify-between items-center text-red-500 text-[10px] font-black">
-                            <span>PLAY NOW</span><i class="fa fa-circle-play text-lg"></i>
-                        </div>
-                    </div>`;
-                card.onmouseenter = () => card.querySelector('video').play().catch(()=>{});
-                card.onmouseleave = () => card.querySelector('video').pause();
-                card.onclick = () => {
-                    document.getElementById('playingTitle').innerText = m.title;
-                    const vp = document.getElementById('mainPlayer');
-                    vp.src = m.link;
-                    document.getElementById('videoModal').classList.replace('hidden', 'flex');
+                `;
+                card.onmouseenter = () => {
+                    const box = document.getElementById(`pv-${m.id}`);
+                    if(!box.innerHTML) box.innerHTML = `<video src="${m.link}" class="preview-vid" muted playsinline loop autoplay></video>`;
+                    else box.querySelector('video').play();
+                    box.classList.remove('has-played');
                 };
+                card.onmouseleave = () => document.getElementById(`pv-${m.id}`).classList.add('has-played');
+                card.onclick = () => window.playVideo(m.id);
                 grid.appendChild(card);
             });
         };
 
-        onSnapshot(query(moviesCol, orderBy("createdAt", "desc")), (snap) => {
+        // --- REALTIME LISTENER + NOTIF ---
+        onSnapshot(query(moviesCol, orderBy("createdAt", "desc"), limit(40)), (snap) => {
+            const added = snap.docChanges().filter(c => c.type === 'added');
+            if(added.length > 0 && cachedMovies.length > 0) {
+                Toast.fire({ icon: 'info', title: 'Video baru telah ditambahkan! 🚀' });
+            }
+            
             cachedMovies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            applyFilter();
+            if(currentFilter !== 'history') render(cachedMovies);
+            
+            const slider = document.getElementById('heroSlider');
+            slider.innerHTML = '';
+            cachedMovies.slice(0, 3).forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = `slide ${i === 0 ? 'active' : ''}`;
+                div.innerHTML = `
+                    <img src="${m.thumb}" class="w-full h-full object-cover brightness-[0.3]">
+                    <div class="absolute inset-0 flex flex-col justify-center px-8">
+                        <h2 class="text-2xl font-black uppercase italic tracking-tighter leading-none">${m.title}</h2>
+                        <button onclick="window.playVideo('${m.id}')" class="btn-resp mt-4 bg-[var(--accent)] px-6 py-2 rounded-full w-fit font-black text-[10px] shadow-lg shadow-[var(--accent-glow)]">WATCH NOW</button>
+                    </div>`;
+                slider.appendChild(div);
+            });
         });
-
-        document.getElementById('searchInput').oninput = (e) => {
-            const val = e.target.value.toLowerCase();
-            render(cachedMovies.filter(m => m.title.toLowerCase().includes(val)));
-        };
-
-        // CRUD Operations
-        window.editThis = (id, title, desc, link, thumb) => {
-            document.getElementById('editId').value = id;
-            document.getElementById('upTitle').value = title;
-            document.getElementById('upDesc').value = desc;
-            document.getElementById('upLink').value = link;
-            document.getElementById('upThumb').value = thumb;
-            document.getElementById('modalHeadTitle').innerHTML = 'Edit <span class="text-red-600">Content</span>';
-            document.getElementById('submitBtn').innerText = "Update Now";
-            window.toggleModal('uploadModal');
-        };
-
-        window.deleteThis = async (id) => {
-            const res = await Swal.fire({ title: 'Hapus Video?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ff003c', background: '#080808', color: '#fff' });
-            if(res.isConfirmed) await deleteDoc(doc(db, "movies", id));
-        };
 
         document.getElementById('movieForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
             const data = {
                 title: document.getElementById('upTitle').value,
-                desc: document.getElementById('upDesc').value,
                 link: document.getElementById('upLink').value,
                 thumb: document.getElementById('upThumb').value,
                 createdAt: serverTimestamp()
             };
-            try {
-                if(id) await updateDoc(doc(db, "movies", id), data);
-                else await addDoc(moviesCol, data);
-                window.toggleModal('uploadModal');
-                Swal.fire({ icon: 'success', title: 'Success!', background: '#111', color: '#fff', timer: 1500, showConfirmButton: false });
-            } catch(err) { console.error(err); }
+            id ? await updateDoc(doc(db, "movies", id), data) : await addDoc(moviesCol, data);
+            toggleModal('uploadModal');
+            Toast.fire({ icon: 'success', title: 'Berhasil diproses!' });
         };
+
+        window.changeTab = (cat, el) => {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            currentFilter = cat;
+            if(cat === 'history') {
+                const h = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+                render(h);
+                document.getElementById('tabTitle').innerText = "RIWAYAT TONTON";
+            } else {
+                let d = cachedMovies;
+                if(cat === 'trending') d = [...cachedMovies].slice(0, 6);
+                render(d);
+                document.getElementById('tabTitle').innerText = "COLLECTION";
+            }
+        };
+
+        document.getElementById('searchInput').oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            render(cachedMovies.filter(m => m.title.toLowerCase().includes(val)));
+        };
+
+        setInterval(() => {
+            const slides = document.querySelectorAll('.slide');
+            if(slides.length < 2) return;
+            let act = [...slides].findIndex(s => s.classList.contains('active'));
+            slides[act].classList.remove('active');
+            slides[(act + 1) % slides.length].classList.add('active');
+        }, 5000);
     </script>
 </body>
 </html>
