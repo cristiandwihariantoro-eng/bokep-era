@@ -3,93 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIRAL - Ultimate Fix</title>
+    <title>Gamon Era - Cinematic Pro Fix</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     
     <style>
         :root { --netflix-red: #E50914; --bg-dark: #0f0f0f; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-dark); color: white; overflow-x: hidden; }
-        
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .nav-scrolled { background: rgba(0, 0, 0, 0.95); padding: 12px 0 !important; }
-        
-        .movie-card { transition: all 0.5s ease; cursor: pointer; position: relative; border-radius: 12px; overflow: hidden; }
-        .movie-card:hover { transform: scale(1.05); z-index: 50; }
-        
-        /* TOMBOL HAPUS - Terlihat Jelas */
-        .btn-delete-fixed {
-            position: absolute; top: 8px; right: 8px;
-            background: #ff0000; color: white;
-            width: 35px; height: 35px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100; border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        .preview-video {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            object-fit: cover; opacity: 0; transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-dark); color: white; overflow-x: hidden; padding-bottom: 80px; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .movie-card { transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; position: relative; border-radius: 12px; overflow: hidden; }
+        .movie-card:hover { transform: scale(1.08); z-index: 50; }
+        .preview-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; pointer-events: none; }
         .movie-card:hover .preview-video { opacity: 1; }
-
-        .continue-bar-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.1); }
-        .continue-bar { height: 100%; background: var(--netflix-red); }
-        
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; }
-        .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-around; align-items: center; z-index: 500; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #777; font-size: 10px; cursor: pointer; }
+        .nav-item.active { color: #E50914; }
         #movieGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        @media (min-width: 1024px) { #movieGrid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
+        @media (min-width: 1024px) { #movieGrid { grid-template-columns: repeat(5, 1fr); gap: 25px; } }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 16px; overflow: hidden; }
+        .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .btn-delete { position: absolute; top: 8px; right: 8px; background: red; color: white; width: 30px; height: 30px; border-radius: 6px; z-index: 60; display: flex; items-center; justify-center; }
     </style>
 </head>
 <body>
 
-    <nav id="navbar" class="fixed top-0 w-full z-[100] transition-all duration-500 px-6 md:px-12 py-6 flex items-center justify-between">
-        <h1 class="text-2xl font-black text-red-600 tracking-tighter italic">VIRAL</h1>
-        <button onclick="toggleUpload()" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg uppercase text-xs">Upload</button>
+    <nav id="navbar" class="fixed top-0 w-full z-[100] px-6 py-6 flex items-center justify-between transition-all">
+        <h1 class="text-3xl font-extrabold text-red-600 italic">GAMON ERA</h1>
     </nav>
 
-    <section class="relative h-[60vh] md:h-[80vh] w-full flex items-center px-6 md:px-16 overflow-hidden">
-        <div class="absolute inset-0 -z-10">
-            <img src="https://images.alphacoders.com/131/1311095.jpeg" class="w-full h-full object-cover brightness-[0.3]">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent"></div>
-        </div>
-        <div class="max-w-2xl" data-aos="fade-right">
-            <h2 class="text-5xl font-bold mb-4">Interstellar</h2>
-            <p class="text-gray-400 mb-8 line-clamp-2">Menembus batas ruang dan waktu untuk menyelamatkan umat manusia.</p>
-            <button onclick="document.getElementById('library').scrollIntoView({behavior:'smooth'})" class="px-8 py-3 bg-white text-black font-bold rounded-lg shadow-xl">Mulai Nonton</button>
+    <section class="relative h-[70vh] flex items-center px-6 md:px-16 overflow-hidden">
+        <div class="absolute inset-0 -z-10 bg-gradient-to-t from-[#0f0f0f] to-transparent"></div>
+        <div class="max-w-3xl" data-aos="fade-up">
+            <h2 class="text-6xl font-black mb-5">Interstellar</h2>
+            <p class="text-gray-400 mb-10">Menembus batas ruang dan waktu untuk menyelamatkan manusia.</p>
+            <button onclick="document.getElementById('library').scrollIntoView({behavior:'smooth'})" class="px-10 py-4 bg-red-600 text-white font-bold rounded-full">Mulai Nonton</button>
         </div>
     </section>
 
-    <section id="library" class="py-16 px-6 md:px-12">
-        <h3 class="text-xl font-bold mb-10 border-l-4 border-red-600 pl-4 uppercase tracking-widest">Global Library (Real-time)</h3>
+    <section id="library" class="py-24 px-6 md:px-12">
+        <h3 class="text-2xl font-bold mb-12 border-l-4 border-red-600 pl-5 uppercase">Global Library (Real-time)</h3>
         <div id="movieGrid"></div>
     </section>
 
-    <div id="uploadModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xl p-8 rounded-3xl relative">
-            <button onclick="toggleUpload()" class="absolute top-6 right-6 text-3xl text-gray-500">&times;</button>
-            <h2 class="text-2xl font-bold mb-6">Publish Video</h2>
-            <form id="uploadForm" class="space-y-4">
-                <input type="text" id="upTitle" placeholder="Judul Video" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none" required>
-                <textarea id="upDesc" placeholder="Sinopsis..." class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none h-24" required></textarea>
-                <input type="url" id="upLink" placeholder="Link Video (.mp4)" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none" required>
-                <input type="url" id="upThumb" placeholder="Link Thumbnail" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none">
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <i class="fa fa-home text-xl"></i><span>Beranda</span>
+        </div>
+        <div class="nav-item" onclick="toggleUpload()">
+            <i class="fa fa-plus-circle text-2xl text-red-600"></i><span>Post</span>
+        </div>
+        <div class="nav-item" onclick="toggleGuide()">
+            <i class="fa fa-book text-xl"></i><span>Panduan</span>
+        </div>
+    </div>
+
+    <div id="guideModal" class="fixed inset-0 z-[600] hidden items-center justify-center p-6 bg-black/95 backdrop-blur-lg">
+        <div class="glass w-full max-w-xl p-10 rounded-3xl relative">
+            <button onclick="toggleGuide()" class="absolute top-6 right-6 text-3xl">&times;</button>
+            <h2 class="text-3xl font-black mb-8 text-red-600 uppercase">Panduan Upload</h2>
+            <p class="mb-4">1. Buka <a href="https://catbox.moe" target="_blank" class="text-blue-400 underline">Catbox.moe</a>, upload video, salin link.</p>
+            <p class="mb-4">2. Screenshot video untuk thumbnail, upload lagi ke Catbox, salin link gambar.</p>
+            <button onclick="toggleGuide()" class="w-full py-4 mt-6 bg-red-600 rounded-xl font-bold">MENGERTI</button>
+        </div>
+    </div>
+
+    <div id="uploadModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-lg">
+        <div class="glass w-full max-w-xl p-10 rounded-3xl relative">
+            <button onclick="toggleUpload()" class="absolute top-6 right-6 text-3xl">&times;</button>
+            <h2 class="text-3xl font-black mb-8">Upload Video</h2>
+            <form id="uploadForm" class="space-y-5">
+                <input type="text" id="upTitle" placeholder="Judul Video" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10" required>
+                <textarea id="upDesc" placeholder="Sinopsis..." class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10 h-24" required></textarea>
+                <input type="url" id="upLink" placeholder="Link Video (.mp4)" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10" required>
+                <input type="url" id="upThumb" placeholder="Link Thumbnail" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10">
                 <button type="submit" class="w-full py-4 bg-red-600 rounded-xl font-bold">PUBLISH</button>
             </form>
         </div>
     </div>
 
     <div id="videoModal" class="fixed inset-0 z-[300] hidden flex-col items-center justify-center bg-black p-4">
-        <div class="w-full max-w-5xl">
-            <div class="flex justify-between mb-4">
-                <h4 id="playingTitle" class="text-xl font-bold"></h4>
-                <button onclick="closePlayer()" class="bg-white/10 px-4 py-2 rounded-lg font-bold">Tutup</button>
+        <div class="w-full max-w-6xl">
+            <div class="flex justify-between mb-5">
+                <h4 id="playingTitle" class="text-2xl font-bold"></h4>
+                <button onclick="closePlayer()" class="bg-red-600 px-6 py-2 rounded-full font-bold">Tutup</button>
             </div>
             <div class="video-wrapper"><video id="mainPlayer" controls></video></div>
         </div>
@@ -99,6 +99,36 @@
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/dist/lenis.min.js"></script>
+
+    <script>
+        // FUNGSI NAVIGASI (Dikeluarkan dari module agar onclick bekerja)
+        function toggleUpload() {
+            const m = document.getElementById('uploadModal');
+            m.classList.toggle('hidden'); m.classList.toggle('flex');
+        }
+        function toggleGuide() {
+            const m = document.getElementById('guideModal');
+            m.classList.toggle('hidden'); m.classList.toggle('flex');
+        }
+        function switchTab(tab) {
+            if(tab === 'home') window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+        function closePlayer() {
+            const v = document.getElementById('mainPlayer');
+            v.pause();
+            document.getElementById('videoModal').classList.add('hidden');
+        }
+
+        // INIT LENIS DENGAN PROTEKSI
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Lenis !== 'undefined') {
+                const lenis = new Lenis();
+                function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+                requestAnimationFrame(raf);
+            }
+            AOS.init({ duration: 1000, once: true });
+        });
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -117,11 +147,8 @@
         const db = getFirestore(app);
         const moviesCol = collection(db, "movies");
 
-        // FIX LENIS DEFINED
-        try { if (typeof Lenis !== 'undefined') { const lenis = new Lenis(); function raf(time) { lenis.raf(time); requestAnimationFrame(raf); } requestAnimationFrame(raf); } } catch (e) {}
-
-        const q = query(moviesCol, orderBy("createdAt", "desc"));
-        onSnapshot(q, (snapshot) => {
+        // RENDER DATA
+        onSnapshot(query(moviesCol, orderBy("createdAt", "desc")), (snapshot) => {
             const grid = document.getElementById('movieGrid');
             grid.innerHTML = '';
             snapshot.forEach(docSnap => {
@@ -130,50 +157,43 @@
                 const card = document.createElement('div');
                 card.className = "movie-card";
                 card.innerHTML = `
-                    <button class="btn-delete-fixed" onclick="deleteMe('${id}', event)"><i class="fa fa-trash"></i></button>
-                    <img src="${m.thumb || 'https://via.placeholder.com/500x750'}" class="w-full h-full object-cover">
+                    <button class="btn-delete" data-id="${id}"><i class="fa fa-trash"></i></button>
+                    <img src="${m.thumb}" class="w-full h-full object-cover">
                     <video class="preview-video" muted playsinline loop><source src="${m.link}" type="video/mp4"></video>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black p-4 flex flex-col justify-end">
-                        <h4 class="font-bold text-xs">${m.title}</h4>
-                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black p-4 flex flex-col justify-end text-sm font-bold">${m.title}</div>
                 `;
                 
                 // Fix Play Interruption
                 card.onmouseenter = () => { 
-                    const v = card.querySelector('video'); 
+                    const v = card.querySelector('video');
                     const playPromise = v.play();
                     if (playPromise !== undefined) { playPromise.catch(() => {}); }
                 };
-                card.onmouseleave = () => { const v = card.querySelector('video'); v.pause(); v.currentTime = 0; };
-                card.onclick = () => openPlayer(m.link, m.title, id);
+                card.onmouseleave = () => { card.querySelector('video').pause(); };
+                
+                // Open Player
+                card.onclick = (e) => {
+                    if(e.target.closest('.btn-delete')) return;
+                    const vp = document.getElementById('mainPlayer');
+                    document.getElementById('playingTitle').innerText = m.title;
+                    vp.src = m.link;
+                    document.getElementById('videoModal').classList.remove('hidden');
+                    document.getElementById('videoModal').classList.add('flex');
+                    vp.play();
+                };
+
+                // Delete Logic
+                card.querySelector('.btn-delete').onclick = async (e) => {
+                    e.stopPropagation();
+                    const confirm = await Swal.fire({ title: 'Hapus video?', icon: 'warning', showCancelButton: true });
+                    if(confirm.isConfirmed) await deleteDoc(doc(db, "movies", id));
+                };
+
                 grid.appendChild(card);
             });
         });
 
-        window.deleteMe = async (id, e) => {
-            e.stopPropagation();
-            const { isConfirmed } = await Swal.fire({
-                title: 'Hapus Video?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ff0000',
-                background: '#1a1a1a', color: '#fff'
-            });
-            if (isConfirmed) { await deleteDoc(doc(db, "movies", id)); }
-        };
-
-        window.openPlayer = (link, title) => {
-            const v = document.getElementById('mainPlayer');
-            document.getElementById('playingTitle').innerText = title;
-            v.src = link;
-            document.getElementById('videoModal').classList.remove('hidden');
-            document.getElementById('videoModal').classList.add('flex');
-            v.play();
-        };
-
-        window.closePlayer = () => { document.getElementById('mainPlayer').pause(); document.getElementById('videoModal').classList.add('hidden'); };
-        window.toggleUpload = () => document.getElementById('uploadModal').classList.toggle('hidden');
-
+        // UPLOAD LOGIC
         document.getElementById('uploadForm').onsubmit = async (e) => {
             e.preventDefault();
             await addDoc(moviesCol, {
@@ -185,9 +205,8 @@
             });
             toggleUpload();
             e.target.reset();
+            Swal.fire('Berhasil!', 'Video sudah dipost.', 'success');
         };
-
-        AOS.init();
     </script>
 </body>
 </html>
