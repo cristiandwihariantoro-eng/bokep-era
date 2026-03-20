@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>VIRAL - Ultra Crystal Ultimate</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -24,7 +23,7 @@
         .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
         .slide.active { opacity: 1; }
 
-        .movie-card { border-radius: 20px; overflow: hidden; background: #0a0a0a; position: relative; box-shadow: 0 10px 20px -10px var(--accent-glow); transition: 0.3s; }
+        .movie-card { border-radius: 20px; overflow: hidden; background: #0a0a0a; position: relative; box-shadow: 0 10px 20px -10px var(--accent-glow); transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; }
         .preview-box { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s; z-index: 5; background: #000; }
         .movie-card:hover .preview-box { opacity: 1; }
         .preview-box.has-played { opacity: 0.4; } 
@@ -38,7 +37,19 @@
         .theme-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
         
         .badge-new { position: absolute; top: 10px; left: 10px; z-index: 30; background: var(--accent); color: white; font-size: 8px; font-weight: 900; padding: 3px 8px; border-radius: 5px; box-shadow: 0 0 15px var(--accent-glow); text-transform: uppercase; }
+        .badge-category { position: absolute; bottom: 40px; left: 10px; z-index: 30; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; font-size: 8px; font-weight: bold; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Skeleton Animation */
+        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+        .skeleton { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 1000px 100%; animation: shimmer 2s infinite linear; }
+        
+        .highlight { color: var(--accent); font-weight: bold; }
+        
+        .admin-only { display: none; }
+        body.is-admin .admin-only { display: flex; }
+        body.is-admin .admin-only-block { display: block; }
     </style>
 </head>
 <body>
@@ -58,32 +69,51 @@
                 <div onclick="setTheme('#ffcc00')" class="theme-dot bg-[#ffcc00]"></div>
             </div>
         </div>
-        <div class="glass-ultra px-4 py-2 rounded-full flex items-center">
-            <i class="fa fa-search text-white/20 mr-2 text-xs"></i>
-            <input type="text" id="searchInput" placeholder="Cari..." class="bg-transparent border-none outline-none text-xs w-20 focus:w-32 transition-all text-white">
+        <div class="flex items-center gap-3">
+            <div class="glass-ultra px-4 py-2 rounded-full flex items-center">
+                <i class="fa fa-search text-white/20 mr-2 text-xs"></i>
+                <input type="text" id="searchInput" placeholder="Cari judul/kategori..." class="bg-transparent border-none outline-none text-xs w-20 focus:w-36 transition-all text-white">
+            </div>
+            <button onclick="toggleAuthModal()" class="w-8 h-8 rounded-full glass-ultra flex items-center justify-center text-white/50 hover:text-white transition">
+                <i class="fa fa-user text-xs" id="userIcon"></i>
+            </button>
         </div>
     </nav>
 
     <section id="heroSlider" class="mb-4"></section>
 
-    <div class="px-6 mb-6 flex items-center gap-6 overflow-x-auto no-scrollbar bg-transparent">
+    <div class="px-6 mb-6 flex items-center gap-4 overflow-x-auto no-scrollbar bg-transparent" id="tabContainer">
         <button onclick="changeTab('all', this)" class="tab-item active btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Semua</button>
         <button onclick="changeTab('trending', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Trending</button>
         <button onclick="changeTab('history', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Riwayat</button>
+        <div class="w-[1px] h-4 bg-white/20 mx-2"></div>
+        <button onclick="changeTab('Anime', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Anime</button>
+        <button onclick="changeTab('Film', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Film</button>
+        <button onclick="changeTab('Musik', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Musik</button>
+        <button onclick="changeTab('Viral', this)" class="tab-item btn-resp whitespace-nowrap text-[10px] tracking-tighter uppercase">Viral</button>
     </div>
 
     <main class="px-5">
         <div class="flex justify-between items-center mb-4">
             <h2 id="tabTitle" class="text-xl font-black uppercase italic tracking-tighter">Collection</h2>
-            <div id="videoCount" class="text-[9px] font-bold opacity-30 tracking-widest uppercase">0 items</div>
+            <div id="videoCount" class="text-[9px] font-bold opacity-30 tracking-widest uppercase">Memuat...</div>
         </div>
-        <div id="movieGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        <div id="movieGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="movie-card skeleton h-48 rounded-20px"></div>
+            <div class="movie-card skeleton h-48 rounded-20px"></div>
+            <div class="movie-card skeleton h-48 rounded-20px"></div>
+            <div class="movie-card skeleton h-48 rounded-20px"></div>
+        </div>
     </main>
 
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm h-16 glass-ultra rounded-full flex justify-around items-center z-[1100]">
-        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="btn-resp text-white/40"><i class="fa fa-house text-lg"></i></button>
-        <button onclick="openUploadModal()" class="btn-resp w-12 h-12 bg-[var(--accent)] rounded-full flex items-center justify-center text-white shadow-lg -translate-y-4 border-4 border-black"><i class="fa fa-plus text-xl"></i></button>
-        <button onclick="toggleModal('guideModal')" class="btn-resp text-white/40"><i class="fa fa-circle-info text-lg"></i></button>
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="btn-resp text-white/40 hover:text-[var(--accent)]"><i class="fa fa-house text-lg"></i></button>
+        
+        <button onclick="openUploadModal()" class="admin-only btn-resp w-12 h-12 bg-[var(--accent)] rounded-full items-center justify-center text-white shadow-lg -translate-y-4 border-4 border-black"><i class="fa fa-plus text-xl"></i></button>
+        
+        <button onclick="openAdminDashboard()" class="admin-only btn-resp text-white/40 hover:text-[var(--accent)]"><i class="fa fa-chart-pie text-lg"></i></button>
+        
+        <button onclick="toggleModal('guideModal')" class="btn-resp text-white/40 hover:text-[var(--accent)]"><i class="fa fa-circle-info text-lg"></i></button>
     </div>
 
     <div id="uploadModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-6 bg-black/40 backdrop-blur-2xl">
@@ -91,9 +121,16 @@
             <h2 id="modalHeadTitle" class="text-xl font-black mb-6 uppercase italic">Post <span class="text-[var(--accent)]">Video</span></h2>
             <form id="movieForm" class="space-y-3">
                 <input type="hidden" id="editId">
-                <input type="text" id="upTitle" placeholder="Judul Video" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white" required>
-                <input type="url" id="upLink" placeholder="Link .mp4" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white" required>
-                <input type="url" id="upThumb" placeholder="Link Thumbnail" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white" required>
+                <input type="text" id="upTitle" placeholder="Judul Video" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white border border-white/10 focus:border-[var(--accent)] transition" required>
+                <select id="upCategory" class="w-full bg-[#111] p-3 rounded-xl outline-none text-xs text-white border border-white/10 focus:border-[var(--accent)] transition" required>
+                    <option value="" disabled selected>Pilih Kategori</option>
+                    <option value="Anime">Anime</option>
+                    <option value="Film">Film</option>
+                    <option value="Musik">Musik</option>
+                    <option value="Viral">Viral</option>
+                </select>
+                <input type="url" id="upLink" placeholder="Link Video (.mp4)" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white border border-white/10 focus:border-[var(--accent)] transition" required>
+                <input type="url" id="upThumb" placeholder="Link Thumbnail (Image)" class="w-full bg-white/5 p-3 rounded-xl outline-none text-xs text-white border border-white/10 focus:border-[var(--accent)] transition" required>
                 <div class="flex gap-3 mt-4">
                     <button type="submit" id="submitBtn" class="btn-resp flex-1 py-3 bg-[var(--accent)] rounded-xl font-black text-xs uppercase shadow-lg shadow-[var(--accent-glow)]">PUBLISH</button>
                     <button type="button" onclick="toggleModal('uploadModal')" class="btn-resp px-6 py-3 bg-white/10 rounded-xl font-bold text-[10px]">BATAL</button>
@@ -102,13 +139,89 @@
         </div>
     </div>
 
-    <div id="videoModal" class="fixed inset-0 z-[3000] hidden bg-black/90 flex-col items-center justify-center p-4 backdrop-blur-3xl">
-        <div class="w-full max-w-4xl">
-            <div class="flex justify-between items-center mb-3">
-                <h4 id="playingTitle" class="font-bold truncate text-sm italic px-2"></h4>
-                <button onclick="closePlayer()" class="btn-resp px-4 py-1.5 bg-[var(--accent)] rounded-full text-[10px] font-black uppercase">CLOSE</button>
+    <div id="loginModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-6 bg-black/40 backdrop-blur-2xl">
+        <div class="glass-ultra w-full max-w-xs p-8 rounded-[40px] text-center">
+            <h2 class="text-xl font-black mb-2 uppercase italic text-[var(--accent)]">System Access</h2>
+            <p class="text-[10px] text-white/50 mb-6">Enter admin PIN to unlock features.</p>
+            <form id="loginForm" class="space-y-4">
+                <input type="password" id="adminPin" placeholder="Enter PIN" class="w-full bg-white/5 p-3 rounded-xl outline-none text-center tracking-widest text-sm text-white border border-white/10 focus:border-[var(--accent)] transition" required>
+                <button type="submit" class="btn-resp w-full py-3 bg-[var(--accent)] rounded-xl font-black text-xs uppercase shadow-lg shadow-[var(--accent-glow)]">LOGIN</button>
+                <button type="button" onclick="logoutAdmin()" id="logoutBtn" class="hidden btn-resp w-full py-3 bg-red-500/20 text-red-500 rounded-xl font-black text-xs uppercase border border-red-500/50">LOGOUT</button>
+                <button type="button" onclick="toggleModal('loginModal')" class="btn-resp w-full py-2 text-white/30 font-bold text-[10px]">TUTUP</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboardModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-6 bg-black/40 backdrop-blur-2xl">
+        <div class="glass-ultra w-full max-w-md p-8 rounded-[40px]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black uppercase italic">Admin <span class="text-[var(--accent)]">Stats</span></h2>
+                <button onclick="toggleModal('dashboardModal')" class="btn-resp w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><i class="fa fa-times text-xs"></i></button>
             </div>
-            <video id="mainPlayer" class="w-full rounded-[25px] shadow-2xl" controls autoplay></video>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                    <i class="fa fa-video text-[var(--accent)] text-xl mb-2"></i>
+                    <h3 class="text-2xl font-black" id="statVideos">0</h3>
+                    <p class="text-[9px] text-white/50 uppercase tracking-widest">Total Video</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                    <i class="fa fa-eye text-blue-400 text-xl mb-2"></i>
+                    <h3 class="text-2xl font-black" id="statViews">0</h3>
+                    <p class="text-[9px] text-white/50 uppercase tracking-widest">Total Views</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                    <i class="fa fa-heart text-red-500 text-xl mb-2"></i>
+                    <h3 class="text-2xl font-black" id="statLikes">0</h3>
+                    <p class="text-[9px] text-white/50 uppercase tracking-widest">Total Likes</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                    <i class="fa fa-calendar-day text-emerald-400 text-xl mb-2"></i>
+                    <h3 class="text-2xl font-black" id="statDaily">0</h3>
+                    <p class="text-[9px] text-white/50 uppercase tracking-widest">Upload Hari Ini</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="videoModal" class="fixed inset-0 z-[3000] hidden bg-black/95 flex-col items-center justify-start overflow-y-auto no-scrollbar pt-6 pb-20 backdrop-blur-3xl">
+        <div class="w-full max-w-4xl px-4 flex flex-col gap-4">
+            <div class="flex justify-between items-center bg-black/50 p-3 rounded-2xl backdrop-blur-md sticky top-0 z-50">
+                <h4 id="playingTitle" class="font-bold truncate text-sm italic px-2 w-2/3"></h4>
+                <div class="flex gap-2">
+                    <button onclick="downloadCurrentVideo()" class="btn-resp w-8 h-8 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-[10px]"><i class="fa fa-download"></i></button>
+                    <button onclick="closePlayer()" class="btn-resp px-4 py-1.5 bg-[var(--accent)] rounded-full text-[10px] font-black uppercase">CLOSE</button>
+                </div>
+            </div>
+            
+            <div class="relative w-full rounded-[25px] overflow-hidden shadow-2xl bg-black border border-white/10">
+                <video id="mainPlayer" class="w-full max-h-[60vh] object-contain" controls autoplay playsinline></video>
+            </div>
+
+            <div class="flex justify-between items-center px-2">
+                <div class="flex gap-4">
+                    <button onclick="toggleLikeCurrent()" id="btnLikeModal" class="btn-resp flex items-center gap-2 text-white/60 hover:text-red-500 transition">
+                        <i class="fa fa-heart text-lg"></i> <span id="modalLikeCount" class="text-xs font-bold">0</span>
+                    </button>
+                    <div class="flex items-center gap-2 text-white/40">
+                        <i class="fa fa-eye text-lg"></i> <span id="modalViewCount" class="text-xs font-bold">0</span>
+                    </div>
+                </div>
+                <button onclick="shareCurrentVideo()" class="btn-resp flex items-center gap-2 text-white/60 hover:text-emerald-400">
+                    <i class="fa fa-share text-lg"></i> <span class="text-xs font-bold">Share</span>
+                </button>
+            </div>
+
+            <div class="glass-ultra p-5 rounded-[30px] mt-2">
+                <h3 class="text-sm font-black uppercase italic mb-4">Komentar (<span id="commentCount">0</span>)</h3>
+                
+                <form id="commentForm" class="flex gap-2 mb-6">
+                    <input type="text" id="commentInput" placeholder="Tulis komentar..." class="flex-1 bg-white/5 p-3 rounded-xl outline-none text-xs text-white border border-white/10 focus:border-[var(--accent)]" required>
+                    <button type="submit" class="btn-resp px-4 bg-[var(--accent)] rounded-xl text-white"><i class="fa fa-paper-plane text-xs"></i></button>
+                </form>
+
+                <div id="commentsList" class="flex flex-col gap-3 max-h-60 overflow-y-auto no-scrollbar">
+                    </div>
+            </div>
         </div>
     </div>
 
@@ -116,9 +229,10 @@
         <div class="glass-ultra w-full max-w-xs p-8 rounded-[40px]">
             <h2 class="text-xl font-black mb-4 text-[var(--accent)] italic uppercase">Informasi</h2>
             <div class="space-y-4 text-[12px] text-gray-300 leading-relaxed">
-                <p>🚀 <b>Update:</b> Library video bertambah setiap hari.</p>
-                <p>🎬 <b>Fitur:</b> Klik icon pensil untuk edit, sampah untuk hapus.</p>
-                <p>📱 <b>Notif:</b> Dapatkan info video baru secara otomatis.</p>
+                <p>🚀 <b>Notifikasi:</b> Izinkan notifikasi untuk info video baru.</p>
+                <p>❤️ <b>Interaksi:</b> Like, tonton, dan download video favoritmu.</p>
+                <p>💬 <b>Diskusi:</b> Tinggalkan komentar di setiap video.</p>
+                <p class="admin-only-block hidden text-[var(--accent)] font-bold">🛡️ Admin Mode Active: Akses upload, edit, hapus terbuka.</p>
             </div>
             <button onclick="toggleModal('guideModal')" class="btn-resp w-full py-3 mt-6 bg-[var(--accent)] rounded-2xl font-black text-xs">MENGERTI</button>
         </div>
@@ -126,7 +240,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, deleteDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, deleteDoc, updateDoc, limit, increment, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBrf7eFkgI9wtzA-to-3DgU75kOhXxD4cE",
@@ -140,18 +254,51 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const moviesCol = collection(db, "movies");
+        const commentsCol = collection(db, "comments");
 
+        // --- STATE ---
         let cachedMovies = [];
         let currentFilter = 'all';
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
+        let likedVideos = JSON.parse(localStorage.getItem('likedVideos') || '[]');
+        let currentPlayingId = null;
+        let unsubscribeComments = null;
+        let isInitialLoad = true;
 
-        // --- NOTIFIKASI ENGINE ---
+        // --- UTILS & NOTIF ---
         const Toast = Swal.mixin({
             toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
             background: '#111', color: '#fff', timerProgressBar: true
         });
 
+        const checkAdminUI = () => {
+            if(isAdmin) {
+                document.body.classList.add('is-admin');
+                document.getElementById('userIcon').classList.replace('text-white/50', 'text-[var(--accent)]');
+                document.getElementById('adminPin').classList.add('hidden');
+                document.getElementById('loginForm').querySelector('button[type="submit"]').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+            } else {
+                document.body.classList.remove('is-admin');
+                document.getElementById('userIcon').classList.replace('text-[var(--accent)]', 'text-white/50');
+                document.getElementById('adminPin').classList.remove('hidden');
+                document.getElementById('adminPin').value = '';
+                document.getElementById('loginForm').querySelector('button[type="submit"]').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
+            }
+        };
+        checkAdminUI();
+
         window.onload = () => {
-            setTimeout(() => Toast.fire({ icon: 'success', title: 'Library diupdate setiap hari! Enjoy 🚀' }), 1500);
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        };
+
+        const sendPushNotification = (title, body, icon) => {
+            if (Notification.permission === "granted") {
+                new Notification(title, { body, icon });
+            }
         };
 
         // --- THEME ---
@@ -162,167 +309,477 @@
         };
         const st = localStorage.getItem('ui-theme'); if(st) setTheme(st);
 
-        // --- FIX HISTORY SYSTEM (BUG FREE) ---
+        // --- HISTORY ---
         const saveHistory = (m) => {
             if(!m.id || !m.title) return;
             let history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
-            // Filter hanya data valid
             history = history.filter(h => h.id && h.id !== m.id);
-            history.unshift({id: m.id, title: m.title, thumb: m.thumb, link: m.link});
+            history.unshift({id: m.id, title: m.title, thumb: m.thumb, link: m.link, views: m.views||0, likes: m.likes||0, category: m.category||'Uncategorized'});
             localStorage.setItem('watchHistory', JSON.stringify(history.slice(0, 20)));
         };
 
-        window.shareNow = (title) => {
-            if (navigator.share) {
-                navigator.share({ title: title, url: window.location.href });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                Toast.fire({ icon: 'success', title: 'Link tersalin!' });
-            }
+        window.shareNow = (title, e) => {
+            if(e) e.stopPropagation();
+            if (navigator.share) navigator.share({ title: title, url: window.location.href });
+            else { navigator.clipboard.writeText(window.location.href); Toast.fire({ icon: 'success', title: 'Link tersalin!' }); }
         };
+        window.shareCurrentVideo = () => window.shareNow(document.getElementById('playingTitle').innerText);
 
-        // --- CORE FUNCTIONS ---
+        // --- CORE UI FUNCTIONS ---
         window.toggleModal = (id) => {
             const m = document.getElementById(id);
             m.classList.toggle('hidden'); m.classList.toggle('flex');
         };
 
+        window.toggleAuthModal = () => toggleModal('loginModal');
+
+        window.openAdminDashboard = () => {
+            if(!isAdmin) return;
+            let tv = cachedMovies.length;
+            let tViews = cachedMovies.reduce((a, b) => a + (b.views || 0), 0);
+            let tLikes = cachedMovies.reduce((a, b) => a + (b.likes || 0), 0);
+            
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            let tDaily = cachedMovies.filter(m => m.createdAt && m.createdAt.toMillis() >= todayStart.getTime()).length;
+
+            document.getElementById('statVideos').innerText = tv;
+            document.getElementById('statViews').innerText = tViews;
+            document.getElementById('statLikes').innerText = tLikes;
+            document.getElementById('statDaily').innerText = tDaily;
+            
+            toggleModal('dashboardModal');
+        };
+
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const pin = document.getElementById('adminPin').value;
+            if(pin === 'admin123') { // Simple local admin password
+                isAdmin = true;
+                localStorage.setItem('isAdmin', 'true');
+                checkAdminUI();
+                toggleModal('loginModal');
+                Toast.fire({ icon: 'success', title: 'Admin Access Granted' });
+                render(currentFilter === 'history' ? JSON.parse(localStorage.getItem('watchHistory')||'[]') : (currentFilter==='all'?cachedMovies:cachedMovies.filter(m=>m.category===currentFilter)));
+            } else {
+                Toast.fire({ icon: 'error', title: 'PIN Salah!' });
+            }
+        };
+
+        window.logoutAdmin = () => {
+            isAdmin = false;
+            localStorage.setItem('isAdmin', 'false');
+            checkAdminUI();
+            toggleModal('loginModal');
+            Toast.fire({ icon: 'info', title: 'Logged out' });
+            render(currentFilter === 'history' ? JSON.parse(localStorage.getItem('watchHistory')||'[]') : (currentFilter==='all'?cachedMovies:cachedMovies.filter(m=>m.category===currentFilter)));
+        };
+
         window.openUploadModal = () => {
+            if(!isAdmin) return;
             document.getElementById('movieForm').reset();
             document.getElementById('editId').value = "";
             document.getElementById('modalHeadTitle').innerHTML = 'Post <span class="text-[var(--accent)]">Video</span>';
             toggleModal('uploadModal');
         };
 
-        window.editThis = (id) => {
+        window.editThis = (id, e) => {
+            if(e) e.stopPropagation();
+            if(!isAdmin) return;
             const m = cachedMovies.find(v => v.id === id);
             if(!m) return;
             document.getElementById('editId').value = id;
             document.getElementById('upTitle').value = m.title;
             document.getElementById('upLink').value = m.link;
             document.getElementById('upThumb').value = m.thumb;
+            document.getElementById('upCategory').value = m.category || 'Viral';
             document.getElementById('modalHeadTitle').innerHTML = 'Edit <span class="text-[var(--accent)]">Content</span>';
             toggleModal('uploadModal');
         };
 
-        window.deleteThis = (id) => {
-            Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ff003c', background: '#111', color: '#fff' })
-            .then(async (r) => { if(r.isConfirmed) await deleteDoc(doc(db, "movies", id)); });
+        window.deleteThis = (id, e) => {
+            if(e) e.stopPropagation();
+            if(!isAdmin) return;
+            Swal.fire({ title: 'Hapus Video?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ff003c', background: '#111', color: '#fff' })
+            .then(async (r) => { 
+                if(r.isConfirmed) {
+                    try {
+                        await deleteDoc(doc(db, "movies", id));
+                        Toast.fire({ icon: 'success', title: 'Terhapus!' });
+                    } catch(err) { Toast.fire({ icon: 'error', title: 'Gagal menghapus' }); }
+                } 
+            });
         };
 
-        window.playVideo = (id) => {
+        const loadComments = (videoId) => {
+            const list = document.getElementById('commentsList');
+            list.innerHTML = '<div class="text-center text-xs text-white/30 py-4">Memuat komentar...</div>';
+            
+            if(unsubscribeComments) unsubscribeComments();
+
+            const q = query(commentsCol, where("videoId", "==", videoId), orderBy("createdAt", "desc"));
+            unsubscribeComments = onSnapshot(q, (snap) => {
+                document.getElementById('commentCount').innerText = snap.docs.length;
+                if(snap.empty) {
+                    list.innerHTML = '<div class="text-center text-xs text-white/30 py-4">Belum ada komentar. Jadilah yang pertama!</div>';
+                    return;
+                }
+                list.innerHTML = '';
+                snap.docs.forEach(d => {
+                    const c = d.data();
+                    const div = document.createElement('div');
+                    div.className = 'bg-white/5 p-3 rounded-xl border border-white/5';
+                    const date = c.createdAt ? new Date(c.createdAt.toMillis()).toLocaleDateString() : 'Baru saja';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-[var(--accent)]">@${c.username}</span>
+                            <span class="text-[8px] text-white/30">${date}</span>
+                        </div>
+                        <p class="text-xs text-white/80">${c.comment}</p>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        };
+
+        document.getElementById('commentForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if(!currentPlayingId) return;
+            const input = document.getElementById('commentInput');
+            const txt = input.value.trim();
+            if(!txt) return;
+            
+            let uname = localStorage.getItem('guestName');
+            if(!uname) {
+                uname = 'User' + Math.floor(Math.random() * 10000);
+                localStorage.setItem('guestName', uname);
+            }
+
+            try {
+                await addDoc(commentsCol, {
+                    videoId: currentPlayingId,
+                    username: uname,
+                    comment: txt,
+                    createdAt: serverTimestamp()
+                });
+                input.value = '';
+            } catch(err) {
+                Toast.fire({ icon: 'error', title: 'Gagal kirim komentar' });
+            }
+        };
+
+        window.playVideo = async (id) => {
             let m = cachedMovies.find(v => v.id === id) || JSON.parse(localStorage.getItem('watchHistory') || '[]').find(v => v.id === id);
             if(!m) return;
+            
+            currentPlayingId = id;
             document.getElementById('playingTitle').innerText = m.title;
+            document.getElementById('modalViewCount').innerText = m.views || 0;
+            document.getElementById('modalLikeCount').innerText = m.likes || 0;
+            
+            const likeBtn = document.getElementById('btnLikeModal');
+            if(likedVideos.includes(id)) likeBtn.classList.add('text-red-500');
+            else likeBtn.classList.remove('text-red-500');
+
             const vp = document.getElementById('mainPlayer');
             vp.src = m.link;
-            vp.play();
+            vp.play().catch(e => console.log("Autoplay prevented"));
+            
             saveHistory(m);
+            loadComments(id);
             if(document.getElementById('videoModal').classList.contains('hidden')) toggleModal('videoModal');
+
+            // Increment View in Firebase
+            try { await updateDoc(doc(db, "movies", id), { views: increment(1) }); } catch(e){}
         };
 
         window.closePlayer = () => {
             const p = document.getElementById('mainPlayer');
             p.pause(); p.src = "";
+            currentPlayingId = null;
+            if(unsubscribeComments) { unsubscribeComments(); unsubscribeComments = null; }
             toggleModal('videoModal');
         };
 
-        const render = (data) => {
+        window.downloadCurrentVideo = async () => {
+            if(!currentPlayingId) return;
+            const m = cachedMovies.find(v => v.id === currentPlayingId);
+            if(!m) return;
+            
+            Toast.fire({ icon: 'info', title: 'Menyiapkan unduhan...' });
+            
+            try {
+                // Using anchor element to trigger download.
+                const a = document.createElement('a');
+                a.href = m.link;
+                a.download = m.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.mp4';
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (error) {
+                Toast.fire({ icon: 'error', title: 'Gagal mengunduh' });
+            }
+        };
+
+        window.toggleLike = async (id, e) => {
+            if(e) e.stopPropagation();
+            const idx = likedVideos.indexOf(id);
+            const mRef = doc(db, "movies", id);
+            
+            try {
+                if(idx > -1) {
+                    likedVideos.splice(idx, 1);
+                    await updateDoc(mRef, { likes: increment(-1) });
+                } else {
+                    likedVideos.push(id);
+                    await updateDoc(mRef, { likes: increment(1) });
+                }
+                localStorage.setItem('likedVideos', JSON.stringify(likedVideos));
+                
+                // Update UI instantly for the card
+                const likeIcon = document.getElementById(`like-icon-${id}`);
+                const likeCnt = document.getElementById(`like-cnt-${id}`);
+                if(likeIcon && likeCnt) {
+                    if(idx > -1) {
+                        likeIcon.classList.remove('text-red-500');
+                        likeIcon.classList.add('text-white/40');
+                        likeCnt.innerText = Math.max(0, parseInt(likeCnt.innerText) - 1);
+                    } else {
+                        likeIcon.classList.add('text-red-500');
+                        likeIcon.classList.remove('text-white/40');
+                        likeCnt.innerText = parseInt(likeCnt.innerText) + 1;
+                    }
+                }
+            } catch(err) { Toast.fire({ icon: 'error', title: 'Gagal like' }); }
+        };
+
+        window.toggleLikeCurrent = () => window.toggleLike(currentPlayingId);
+
+        const highlightText = (text, query) => {
+            if(!query) return text;
+            const regex = new RegExp(`(${query})`, "gi");
+            return text.replace(regex, "<span class='highlight'>$1</span>");
+        };
+
+        const render = (data, searchQuery = '') => {
             const grid = document.getElementById('movieGrid');
             grid.innerHTML = '';
-            // Hanya tampilkan jika data valid (mempunyai ID dan Thumbnail)
             const validData = data.filter(m => m && m.id && m.thumb);
             document.getElementById('videoCount').innerText = `${validData.length} items`;
 
+            if(validData.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-white/30 py-10 italic">Tidak ada video ditemukan.</div>`;
+                return;
+            }
+
             validData.forEach((m) => {
                 const isNew = m.createdAt && (Date.now() - m.createdAt.toMillis() < 24 * 60 * 60 * 1000);
+                const isLiked = likedVideos.includes(m.id);
                 const card = document.createElement('div');
                 card.className = "movie-card";
+                
+                const titleHtml = highlightText(m.title, searchQuery);
+
                 card.innerHTML = `
                     ${isNew ? '<div class="badge-new">NEW</div>' : ''}
-                    <div class="absolute top-2 right-2 z-[40] flex gap-1.5">
-                        <button onclick="event.stopPropagation(); window.shareNow('${m.title}')" class="btn-resp w-7 h-7 bg-black/60 rounded-full text-emerald-400 text-[10px] flex items-center justify-center"><i class="fa fa-paper-plane"></i></button>
-                        <button onclick="event.stopPropagation(); window.editThis('${m.id}')" class="btn-resp w-7 h-7 bg-black/60 rounded-full text-white text-[10px] flex items-center justify-center"><i class="fa fa-pencil"></i></button>
-                        <button onclick="event.stopPropagation(); window.deleteThis('${m.id}')" class="btn-resp w-7 h-7 bg-black/60 rounded-full text-red-500 text-[10px] flex items-center justify-center"><i class="fa fa-trash"></i></button>
+                    <div class="badge-category">${m.category || 'Viral'}</div>
+                    
+                    <div class="absolute top-2 right-2 z-[40] flex gap-1.5 flex-col items-end">
+                        <div class="flex gap-1.5 admin-only">
+                            <button onclick="event.stopPropagation(); window.editThis('${m.id}', event)" class="btn-resp w-7 h-7 bg-black/60 backdrop-blur-md rounded-full text-white text-[10px] flex items-center justify-center border border-white/10"><i class="fa fa-pencil"></i></button>
+                            <button onclick="event.stopPropagation(); window.deleteThis('${m.id}', event)" class="btn-resp w-7 h-7 bg-black/60 backdrop-blur-md rounded-full text-red-500 text-[10px] flex items-center justify-center border border-white/10"><i class="fa fa-trash"></i></button>
+                        </div>
+                        <button onclick="window.toggleLike('${m.id}', event)" class="btn-resp w-7 h-7 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 mt-1">
+                            <i id="like-icon-${m.id}" class="fa fa-heart text-[10px] ${isLiked ? 'text-red-500' : 'text-white/40'}"></i>
+                        </button>
                     </div>
-                    <img src="${m.thumb}" class="w-full aspect-[3/4] object-cover" onerror="this.src='https://placehold.co/300x400/000/fff?text=No+Image'">
+
+                    <img src="${m.thumb}" class="w-full aspect-[3/4] object-cover" onerror="this.src='https://placehold.co/300x400/111/fff?text=No+Image'">
                     <div class="preview-box" id="pv-${m.id}"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent p-3 flex flex-col justify-end z-[15]">
-                        <h3 class="text-[10px] font-bold truncate uppercase italic">${m.title}</h3>
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent p-3 flex flex-col justify-end z-[15]">
+                        <h3 class="text-[11px] font-bold truncate uppercase italic mb-1">${titleHtml}</h3>
+                        <div class="flex items-center gap-3 text-[9px] text-white/50 font-bold">
+                            <span><i class="fa fa-eye mr-1"></i>${m.views || 0}</span>
+                            <span><i class="fa fa-heart mr-1"></i><span id="like-cnt-${m.id}">${m.likes || 0}</span></span>
+                        </div>
                     </div>
                 `;
+                
                 card.onmouseenter = () => {
                     const box = document.getElementById(`pv-${m.id}`);
                     if(!box.innerHTML) box.innerHTML = `<video src="${m.link}" class="preview-vid" muted playsinline loop autoplay></video>`;
-                    else box.querySelector('video').play();
+                    else { const v = box.querySelector('video'); if(v) v.play().catch(()=>{}); }
                     box.classList.remove('has-played');
                 };
-                card.onmouseleave = () => document.getElementById(`pv-${m.id}`).classList.add('has-played');
+                card.onmouseleave = () => {
+                    const box = document.getElementById(`pv-${m.id}`);
+                    box.classList.add('has-played');
+                    const v = box.querySelector('video'); if(v) v.pause();
+                };
                 card.onclick = () => window.playVideo(m.id);
                 grid.appendChild(card);
             });
         };
 
-        // --- REALTIME LISTENER + NOTIF ---
-        onSnapshot(query(moviesCol, orderBy("createdAt", "desc"), limit(40)), (snap) => {
-            const added = snap.docChanges().filter(c => c.type === 'added');
-            if(added.length > 0 && cachedMovies.length > 0) {
-                Toast.fire({ icon: 'info', title: 'Video baru telah ditambahkan! 🚀' });
-            }
-            
-            cachedMovies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            if(currentFilter !== 'history') render(cachedMovies);
-            
+        const renderSlider = () => {
             const slider = document.getElementById('heroSlider');
+            if(cachedMovies.length === 0) { slider.innerHTML = ''; return; }
             slider.innerHTML = '';
-            cachedMovies.slice(0, 3).forEach((m, i) => {
+            cachedMovies.slice(0, 4).forEach((m, i) => {
                 const div = document.createElement('div');
                 div.className = `slide ${i === 0 ? 'active' : ''}`;
                 div.innerHTML = `
-                    <img src="${m.thumb}" class="w-full h-full object-cover brightness-[0.3]">
-                    <div class="absolute inset-0 flex flex-col justify-center px-8">
-                        <h2 class="text-2xl font-black uppercase italic tracking-tighter leading-none">${m.title}</h2>
-                        <button onclick="window.playVideo('${m.id}')" class="btn-resp mt-4 bg-[var(--accent)] px-6 py-2 rounded-full w-fit font-black text-[10px] shadow-lg shadow-[var(--accent-glow)]">WATCH NOW</button>
+                    <img src="${m.thumb}" class="w-full h-full object-cover brightness-[0.3]" onerror="this.src='https://placehold.co/800x400/111/fff?text=Hero'">
+                    <div class="absolute inset-0 flex flex-col justify-center px-8 z-10">
+                        <span class="bg-[var(--accent)] text-white text-[8px] font-bold px-2 py-1 rounded w-fit mb-2 uppercase">${m.category || 'Viral'}</span>
+                        <h2 class="text-2xl font-black uppercase italic tracking-tighter leading-none line-clamp-2">${m.title}</h2>
+                        <div class="flex items-center gap-4 mt-2 text-xs text-white/60 font-bold">
+                            <span><i class="fa fa-eye mr-1"></i>${m.views || 0}</span>
+                            <span><i class="fa fa-heart mr-1 text-red-500"></i>${m.likes || 0}</span>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="window.playVideo('${m.id}')" class="btn-resp bg-[var(--accent)] px-6 py-2 rounded-full font-black text-[10px] shadow-lg shadow-[var(--accent-glow)]"><i class="fa fa-play mr-2"></i>PLAY</button>
+                            <button onclick="window.shareNow('${m.title}')" class="btn-resp bg-white/10 backdrop-blur-md px-4 py-2 rounded-full font-black text-[10px]"><i class="fa fa-share"></i></button>
+                        </div>
                     </div>`;
                 slider.appendChild(div);
             });
-        });
+        };
+
+        // --- REALTIME LISTENER ---
+        const initData = async () => {
+            try {
+                onSnapshot(query(moviesCol, orderBy("createdAt", "desc"), limit(50)), (snap) => {
+                    const added = snap.docChanges().filter(c => c.type === 'added');
+                    
+                    if(!isInitialLoad && added.length > 0) {
+                        const newVideo = added[0].doc.data();
+                        Toast.fire({ icon: 'info', title: 'Video baru ditambahkan!' });
+                        sendPushNotification('Video Baru Rilis! 🔥', newVideo.title, newVideo.thumb);
+                    }
+                    
+                    cachedMovies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    
+                    if(currentFilter === 'history') {
+                        render(JSON.parse(localStorage.getItem('watchHistory') || '[]'));
+                    } else if (currentFilter === 'trending') {
+                        render([...cachedMovies].sort((a,b) => (b.views||0) - (a.views||0)).slice(0, 10));
+                    } else if (currentFilter === 'all') {
+                        render(cachedMovies);
+                    } else {
+                        render(cachedMovies.filter(m => m.category === currentFilter));
+                    }
+                    
+                    renderSlider();
+                    
+                    // Update current modal stats if playing
+                    if(currentPlayingId) {
+                        const cm = cachedMovies.find(v => v.id === currentPlayingId);
+                        if(cm) {
+                            document.getElementById('modalViewCount').innerText = cm.views || 0;
+                            document.getElementById('modalLikeCount').innerText = cm.likes || 0;
+                        }
+                    }
+                    
+                    isInitialLoad = false;
+                }, (error) => {
+                    Toast.fire({ icon: 'error', title: 'Gagal terhubung ke server. Retrying...' });
+                });
+            } catch(e) { Toast.fire({ icon: 'error', title: 'Network Error!' }); }
+        };
+
+        initData();
+
+        // --- FORM HANDLING (VALIDATION) ---
+        const isValidUrl = url => { try { new URL(url); return true; } catch { return false; } };
+        const isVideoUrl = url => /\.(mp4|webm|ogg)$/i.test(url) || url.includes('firebasestorage') || url.includes('video');
 
         document.getElementById('movieForm').onsubmit = async (e) => {
             e.preventDefault();
+            if(!isAdmin) return;
+
             const id = document.getElementById('editId').value;
-            const data = {
-                title: document.getElementById('upTitle').value,
-                link: document.getElementById('upLink').value,
-                thumb: document.getElementById('upThumb').value,
-                createdAt: serverTimestamp()
-            };
-            id ? await updateDoc(doc(db, "movies", id), data) : await addDoc(moviesCol, data);
-            toggleModal('uploadModal');
-            Toast.fire({ icon: 'success', title: 'Berhasil diproses!' });
+            const title = document.getElementById('upTitle').value;
+            const link = document.getElementById('upLink').value;
+            const thumb = document.getElementById('upThumb').value;
+            const category = document.getElementById('upCategory').value;
+
+            if(!isValidUrl(link) || !isVideoUrl(link)) {
+                return Toast.fire({ icon: 'error', title: 'Link video tidak valid (Harus direct url/mp4)' });
+            }
+            if(!isValidUrl(thumb)) {
+                return Toast.fire({ icon: 'error', title: 'Link thumbnail tidak valid' });
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = 'PROCESSING...';
+            submitBtn.disabled = true;
+
+            try {
+                const data = { title, link, thumb, category };
+                if(id) {
+                    await updateDoc(doc(db, "movies", id), data);
+                } else {
+                    data.createdAt = serverTimestamp();
+                    data.views = 0;
+                    data.likes = 0;
+                    await addDoc(moviesCol, data);
+                }
+                toggleModal('uploadModal');
+                Toast.fire({ icon: 'success', title: 'Berhasil diproses!' });
+            } catch(err) {
+                Toast.fire({ icon: 'error', title: 'Gagal memproses data!' });
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
         };
 
         window.changeTab = (cat, el) => {
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             currentFilter = cat;
+            
+            const titleEl = document.getElementById('tabTitle');
+            
             if(cat === 'history') {
                 const h = JSON.parse(localStorage.getItem('watchHistory') || '[]');
                 render(h);
-                document.getElementById('tabTitle').innerText = "RIWAYAT TONTON";
-            } else {
-                let d = cachedMovies;
-                if(cat === 'trending') d = [...cachedMovies].slice(0, 6);
+                titleEl.innerText = "RIWAYAT TONTON";
+            } else if (cat === 'trending') {
+                const d = [...cachedMovies].sort((a,b) => (b.views||0) - (a.views||0)).slice(0, 10);
                 render(d);
-                document.getElementById('tabTitle').innerText = "COLLECTION";
+                titleEl.innerText = "TRENDING SEKARANG";
+            } else if (cat === 'all') {
+                render(cachedMovies);
+                titleEl.innerText = "SEMUA COLLECTION";
+            } else {
+                const d = cachedMovies.filter(m => m.category === cat);
+                render(d);
+                titleEl.innerText = `KATEGORI: ${cat}`;
             }
         };
 
         document.getElementById('searchInput').oninput = (e) => {
             const val = e.target.value.toLowerCase();
-            render(cachedMovies.filter(m => m.title.toLowerCase().includes(val)));
+            let data = currentFilter === 'all' ? cachedMovies : 
+                       (currentFilter === 'history' ? JSON.parse(localStorage.getItem('watchHistory')||'[]') :
+                       (currentFilter === 'trending' ? [...cachedMovies].sort((a,b) => (b.views||0) - (a.views||0)) :
+                       cachedMovies.filter(m => m.category === currentFilter)));
+            
+            if(val) {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                data = cachedMovies.filter(m => 
+                    m.title.toLowerCase().includes(val) || 
+                    (m.category && m.category.toLowerCase().includes(val))
+                );
+            }
+            render(data, val);
         };
 
+        // Slider Autoplay Logic
         setInterval(() => {
             const slides = document.querySelectorAll('.slide');
             if(slides.length < 2) return;
@@ -330,6 +787,7 @@
             slides[act].classList.remove('active');
             slides[(act + 1) % slides.length].classList.add('active');
         }, 5000);
+
     </script>
 </body>
 </html>
