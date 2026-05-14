@@ -1,973 +1,594 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIRAL - Ultra Crystal Ultimate</title>
+    <title>StreamNest - Stream Anything, Anywhere</title>
     
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
-    <!-- External Libraries -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#E50914',
+                            dark: '#b20710',
+                        },
+                        dark: {
+                            DEFAULT: '#0f0f13',
+                            card: '#1a1a24',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        :root { 
-            --accent: #ff003c; 
-            --accent-glow: rgba(255, 0, 60, 0.4); 
-            --bg-main: #050505;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-        }
-        
-        * { -webkit-tap-highlight-color: transparent; }
-        
-        html.lenis { height: auto; }
-        .lenis.lenis-smooth { scroll-behavior: auto !important; }
-        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-        .lenis.lenis-stopped { overflow: hidden; }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-main); 
-            color: white; 
-            overflow-x: hidden; 
-            padding-bottom: 100px; 
-            transition: background 0.5s ease;
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
-        /* Splash Screen */
-        #splashScreen {
-            position: fixed; inset: 0; z-index: 9999; background: var(--bg-main);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        /* Scroll Progress */
-        #scrollProgress {
-            position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
-            width: 0%; z-index: 2000; box-shadow: 0 0 10px var(--accent-glow);
-            transition: width 0.1s ease;
-        }
-
-        /* Premium Glass Effects */
-        .glass-ultra { 
-            background: rgba(10, 10, 10, 0.6) !important; 
-            backdrop-filter: blur(30px) saturate(180%); 
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border: 1px solid var(--glass-border); 
-        }
-        
-        .glass-nav {
-            background: rgba(5, 5, 5, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Sticky Filter */
-        .sticky-filter {
-            position: sticky; top: 70px; z-index: 900;
-            background: linear-gradient(to bottom, var(--bg-main) 80%, transparent);
-            padding-top: 10px; padding-bottom: 10px;
-        }
-
-        /* Hero Slider */
-        #heroSlider { 
-            height: 60vh; overflow: hidden; position: relative;
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-        }
-        .slide { 
-            position: absolute; inset: 0; opacity: 0; 
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: scale(1.05); visibility: hidden;
-        }
-        .slide.active { opacity: 1; transform: scale(1); visibility: visible; }
-        .hero-overlay { background: linear-gradient(to top, var(--bg-main) 10%, rgba(0,0,0,0) 70%); }
-
-        /* Movie Cards */
-        .movie-card { 
-            border-radius: 20px; overflow: hidden; background: #0f0f0f; position: relative; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.03);
-            content-visibility: auto; contain-intrinsic-size: auto 300px; /* Virtualization */
-        }
-        .movie-card:hover { transform: translateY(-8px) scale(1.03); border-color: var(--accent); box-shadow: 0 20px 40px -15px var(--accent-glow); z-index: 10; }
-        
-        .reveal-item { opacity: 0; transform: translateY(30px) scale(0.98); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
-        .reveal-item.is-visible { opacity: 1; transform: translateY(0) scale(1); }
-
-        .img-lazy { filter: blur(15px); transform: scale(1.05); transition: all 0.5s ease-out; will-change: filter, transform; }
-        .img-lazy.loaded { filter: blur(0); transform: scale(1); }
-
-        .preview-box { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.4s ease; z-index: 5; background: #000; }
-        .movie-card:hover .preview-box { opacity: 1; }
-        video.preview-vid { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Preview Progress Bar */
-        .preview-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--accent); width: 0%; z-index: 6; }
-
-        /* Tabs */
-        .tab-item { color: rgba(255,255,255,0.4); font-weight: 600; transition: all 0.3s ease; padding: 10px 20px; border-radius: 99px; border: 1px solid transparent; font-size: 11px; letter-spacing: 0.05em; }
-        .tab-item.active { color: white; background: var(--accent); box-shadow: 0 8px 15px -5px var(--accent-glow); border-color: rgba(255,255,255,0.1); }
-
-        /* Cinematic Mode */
-        .cinematic-active .video-surroundings { opacity: 0.1; pointer-events: none; transition: opacity 0.5s; }
-        .cinematic-active .video-focus { transform: scale(1.02); z-index: 50; position: relative; transition: transform 0.5s; box-shadow: 0 0 100px rgba(0,0,0,0.9); }
-
-        /* Double Tap Heart */
-        .floating-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 80px; color: var(--accent); z-index: 100; opacity: 0; pointer-events: none; text-shadow: 0 0 20px var(--accent-glow); }
-        .animate-pop { animation: popHeart 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popHeart { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
-
-        /* Misc UI */
-        .ios-dock { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
-        .dock-item { position: relative; transition: all 0.3s ease; }
-        .dock-item:active { transform: scale(0.8); }
-        .dock-item.active i { color: var(--accent); }
-
-        .input-group input, .input-group select { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px 16px; border-radius: 16px; outline: none; transition: all 0.3s; color: white; font-size: 13px; }
-        .input-group input:focus { border-color: var(--accent); background: rgba(255,255,255,0.05); box-shadow: 0 0 15px rgba(255,0,60,0.1); }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
-        .skeleton { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 1000px 100%; animation: shimmer 2s infinite linear; border-radius: 20px; }
-        
-        .badge-premium { position: absolute; top: 12px; left: 12px; z-index: 30; background: var(--accent); color: white; font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 8px; box-shadow: 0 4px 10px var(--accent-glow); }
-        .ai-tag { padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; font-size: 7px; color: #ccc; margin-right: 4px; text-transform: uppercase;}
-        
-        .admin-only { display: none !important; }
-        body.is-admin .admin-only { display: flex !important; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 5px var(--accent); display: none; }
+        .glass {
+            background: rgba(26, 26, 36, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .netflix-hover {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s, box-shadow 0.3s;
+        }
+        
+        .netflix-hover:hover {
+            transform: scale(1.05) translateY(-5px);
+            z-index: 50;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(to top, #0f0f13 0%, transparent 60%),
+                        linear-gradient(to right, #0f0f13 0%, transparent 60%);
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toast-enter { animation: slideInRight 0.3s forwards; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a24 25%, #2a2a35 50%, #1a1a24 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
-<body>
+<body class="flex flex-col md:flex-row min-h-screen">
 
-    <!-- Scroll Indicator -->
-    <div id="scrollProgress"></div>
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- Splash Screen -->
-    <div id="splashScreen">
-        <div class="flex flex-col items-center">
-            <div class="w-16 h-16 bg-[var(--accent)] rounded-2xl flex items-center justify-center shadow-2xl shadow-[var(--accent-glow)] rotate-12 mb-6 animate__animated animate__pulse animate__infinite">
-                <i class="fa fa-play text-white text-2xl"></i>
+    <!-- Desktop Sidebar -->
+    <nav class="hidden md:flex flex-col w-64 glass h-screen fixed left-0 top-0 z-40 px-6 py-8">
+        <div class="flex items-center gap-3 mb-12 cursor-pointer" onclick="app.navigate('home')">
+            <div class="w-10 h-10 rounded-lg bg-brand flex items-center justify-center text-xl font-bold shadow-lg shadow-brand/30">
+                <i class="fas fa-play"></i>
             </div>
-            <h1 class="text-3xl font-black tracking-tighter uppercase italic">VIRAL<span class="text-[var(--accent)]">.</span></h1>
-            <p class="text-xs text-white/40 mt-2 tracking-widest">ULTRA CRYSTAL SYSTEM</p>
-        </div>
-    </div>
-
-    <!-- Nav Bar -->
-    <nav class="fixed top-0 w-full z-[1000] px-6 py-4 flex items-center justify-between glass-nav">
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-9 h-9 bg-[var(--accent)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--accent-glow)] rotate-3">
-                    <i class="fa fa-play text-white text-xs"></i>
-                </div>
-                <h1 class="text-xl font-bold tracking-tighter">VIRAL<span class="text-[var(--accent)]">.</span></h1>
+            <div>
+                <h1 class="text-xl font-bold tracking-wider">StreamNest</h1>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest">Stream Anything</p>
             </div>
         </div>
-        
-        <div class="flex items-center gap-3">
-            <div class="relative group hidden sm:block">
-                <div class="glass-ultra pl-10 pr-4 py-2 rounded-full flex items-center border border-white/5 transition-all">
-                    <i class="fa fa-search absolute left-4 text-white/30 text-xs"></i>
-                    <input type="text" id="searchInput" placeholder="Cari..." class="bg-transparent border-none outline-none text-xs w-20 focus:w-40 md:focus:w-60 transition-all text-white placeholder:text-white/20">
-                </div>
-            </div>
-            
-            <!-- Notification Panel -->
-            <div class="relative">
-                <button onclick="toggleNotifications()" class="w-9 h-9 rounded-full glass-ultra flex items-center justify-center text-white/50 hover:text-white transition relative">
-                    <i class="fa fa-bell"></i>
-                    <div id="notifDot" class="notification-dot"></div>
-                </button>
-                <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-64 glass-ultra rounded-2xl p-4 border border-white/10 shadow-2xl flex-col gap-3 z-[1100]">
-                    <h4 class="text-xs font-bold uppercase text-white/50 border-b border-white/10 pb-2">Notifications</h4>
-                    <div id="notifList" class="flex flex-col gap-2 max-h-48 overflow-y-auto no-scrollbar">
-                        <p class="text-[10px] text-white/30 italic">Belum ada notifikasi baru.</p>
-                    </div>
+
+        <div class="flex-1 space-y-6">
+            <div>
+                <p class="text-xs text-gray-500 font-semibold mb-3 uppercase">Menu</p>
+                <div class="space-y-1">
+                    <button onclick="app.navigate('home')" class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                        <i class="fas fa-home w-5"></i> Home
+                    </button>
+                    <button class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                        <i class="fas fa-compass w-5"></i> Discover
+                    </button>
                 </div>
             </div>
 
-            <button onclick="toggleAuthModal()" class="w-9 h-9 rounded-full glass-ultra flex items-center justify-center text-white/50 hover:text-white transition">
-                <i class="fa fa-user-circle" id="userIcon"></i>
-            </button>
+            <div id="admin-menu-section" class="hidden">
+                <p class="text-xs text-brand font-semibold mb-3 uppercase">Admin Panel</p>
+                <div class="space-y-1">
+                    <button onclick="app.navigate('admin')" class="w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-brand/10 text-brand hover:bg-brand/20 transition-all text-sm font-medium border border-brand/20">
+                        <i class="fas fa-cog w-5"></i> Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto border-t border-white/10 pt-6">
+            <div id="auth-section"></div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="heroSlider" class="mb-2"></section>
-
-    <!-- Categories Tab (Sticky) -->
-    <div class="sticky-filter px-6 mb-6 flex items-center gap-3 overflow-x-auto no-scrollbar" id="tabContainer">
-        <button onclick="changeTab('all', this)" class="tab-item active whitespace-nowrap uppercase">Semua</button>
-        <button onclick="changeTab('trending', this)" class="tab-item whitespace-nowrap uppercase"><i class="fa fa-fire text-red-500 mr-1"></i>Trending</button>
-        <button onclick="changeTab('history', this)" class="tab-item whitespace-nowrap uppercase"><i class="fa fa-history mr-1"></i>Riwayat</button>
-        <button onclick="changeTab('favorite', this)" class="tab-item whitespace-nowrap uppercase"><i class="fa fa-bookmark mr-1"></i>Tersimpan</button>
-        <div class="w-[1px] h-6 bg-white/10 mx-2 shrink-0"></div>
-        <button onclick="changeTab('Anime', this)" class="tab-item whitespace-nowrap uppercase">Anime</button>
-        <button onclick="changeTab('Film', this)" class="tab-item whitespace-nowrap uppercase">Film</button>
-        <button onclick="changeTab('Musik', this)" class="tab-item whitespace-nowrap uppercase">Musik</button>
-        <button onclick="changeTab('Viral', this)" class="tab-item whitespace-nowrap uppercase">Viral</button>
+    <!-- Mobile Topbar -->
+    <div class="md:hidden glass w-full fixed top-0 z-40 px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="app.navigate('home')">
+            <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-sm font-bold">
+                <i class="fas fa-play"></i>
+            </div>
+            <h1 class="text-lg font-bold">StreamNest</h1>
+        </div>
+        <div id="mobile-auth-btn"></div>
     </div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="md:hidden glass w-full fixed bottom-0 z-40 flex justify-around items-center py-3 px-2 border-t border-white/5 pb-safe">
+        <button onclick="app.navigate('home')" class="flex flex-col items-center p-2 text-gray-400">
+            <i class="fas fa-home text-lg mb-1"></i>
+            <span class="text-[10px]">Home</span>
+        </button>
+        <button id="mobile-admin-btn" onclick="app.navigate('admin')" class="hidden flex-col items-center p-2 text-brand">
+            <i class="fas fa-shield-alt text-lg mb-1"></i>
+            <span class="text-[10px]">Admin</span>
+        </button>
+    </nav>
 
     <!-- Main Content -->
-    <main class="px-6 relative z-10">
-        <div class="flex justify-between items-end mb-6">
-            <div>
-                <p id="videoCount" class="text-[10px] font-bold text-[var(--accent)] tracking-[0.2em] uppercase mb-1">Loading Catalog...</p>
-                <h2 id="tabTitle" class="text-2xl font-extrabold uppercase tracking-tight">Collection</h2>
-            </div>
-            <div class="flex gap-2 admin-only">
-                <span class="px-3 py-1 bg-[var(--accent)]/20 text-[var(--accent)] text-[9px] font-black rounded-full border border-[var(--accent)]/30">ADMIN MODE</span>
-            </div>
-        </div>
+    <main class="flex-1 md:ml-64 w-full min-h-screen relative pb-20 md:pb-0 pt-16 md:pt-0 overflow-x-hidden">
         
-        <!-- Grid Container -->
-        <div id="movieGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-            <!-- Initial Skeleton Shimmer -->
-            <div class="movie-card skeleton aspect-[3/4.5]"></div>
-            <div class="movie-card skeleton aspect-[3/4.5]"></div>
-            <div class="movie-card skeleton aspect-[3/4.5]"></div>
-            <div class="movie-card skeleton aspect-[3/4.5]"></div>
-            <div class="movie-card skeleton aspect-[3/4.5]"></div>
-            <div class="movie-card skeleton aspect-[3/4.5]"></div>
-        </div>
-        
-        <!-- Infinite Scroll Sentinel -->
-        <div id="scrollSentinel" class="w-full py-10 flex justify-center items-center mt-4 hidden"></div>
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="view-section w-full min-h-screen">
+            <!-- Hero / Banner Slider -->
+            <div id="hero-container" class="w-full h-[60vh] md:h-[80vh] relative bg-dark-card skeleton overflow-hidden">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="px-5 md:px-10 py-8 space-y-12 -mt-20 relative z-20">
+                <div class="relative max-w-md glass rounded-full overflow-hidden flex items-center px-4 py-2">
+                    <i class="fas fa-search text-gray-400"></i>
+                    <input type="text" id="search-input" placeholder="Search movies, anime..." class="bg-transparent border-none outline-none text-sm px-3 py-2 w-full text-white">
+                </div>
+
+                <!-- Video Rows -->
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold border-l-4 border-brand pl-3">Semua Koleksi</h2>
+                    </div>
+                    <div id="main-row" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        <!-- Konten Otomatis dari Firebase -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: DETAIL & PLAYER -->
+        <section id="view-detail" class="view-section hidden w-full min-h-screen fade-in">
+            <div class="w-full aspect-video bg-black relative" id="player-container">
+                <iframe id="main-player" class="w-full h-full border-none" allowfullscreen allow="autoplay; fullscreen"></iframe>
+            </div>
+
+            <div class="px-5 md:px-10 py-8 max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="hidden md:block w-1/4">
+                        <img id="detail-thumb" src="" alt="Thumbnail" class="w-full rounded-xl shadow-2xl">
+                    </div>
+                    <div class="w-full md:w-3/4 space-y-4">
+                        <div class="flex gap-2 text-xs font-semibold tracking-wider uppercase text-gray-400" id="detail-meta"></div>
+                        <h1 id="detail-title" class="text-3xl md:text-5xl font-bold uppercase tracking-tight"></h1>
+                        <p id="detail-desc" class="text-gray-300 leading-relaxed max-w-3xl"></p>
+                        <div class="flex gap-4 pt-4">
+                            <button onclick="document.getElementById('player-container').scrollIntoView({behavior: 'smooth'})" class="bg-brand hover:bg-brand-dark text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 transition-all">
+                                <i class="fas fa-play"></i> Mulai Menonton
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN PANEL -->
+        <section id="view-admin" class="view-section hidden w-full min-h-screen p-5 md:p-10 fade-in">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold">Admin Dashboard</h2>
+                        <p class="text-gray-400">Kelola database video secara real-time.</p>
+                    </div>
+                    <button onclick="app.openModal('video-modal')" class="bg-brand hover:bg-brand-dark px-5 py-2.5 rounded-lg font-medium flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Tambah Video Baru
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div class="glass p-6 rounded-2xl flex items-center gap-4 border-l-4 border-brand">
+                        <div class="w-12 h-12 rounded-full bg-brand/20 flex items-center justify-center text-brand text-xl">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm">Total Video</p>
+                            <h3 class="text-2xl font-bold" id="stat-total">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white/5 text-gray-400 text-sm">
+                                    <th class="p-4">Thumbnail</th>
+                                    <th class="p-4">Judul & Info</th>
+                                    <th class="p-4">Genre</th>
+                                    <th class="p-4">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- IOS Style Bottom Navigation Dock -->
-    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm h-16 ios-dock rounded-full flex justify-around items-center px-2 z-[1100]">
-        <button onclick="window.scrollTo({top:0, behavior:'smooth'}); changeTab('all', document.querySelector('.tab-item'))" class="dock-item active p-3"><i class="fa fa-home-alt text-lg"></i></button>
-        <button onclick="changeTab('trending', document.querySelectorAll('.tab-item')[1])" class="dock-item p-3 text-white/40"><i class="fa fa-fire text-lg"></i></button>
-        <button onclick="openUploadModal()" class="admin-only dock-item bg-[var(--accent)] w-12 h-12 rounded-full flex items-center justify-center text-white shadow-xl shadow-[var(--accent-glow)] -translate-y-4 border-[4px] border-[#050505]"><i class="fa fa-plus text-lg"></i></button>
-        <button onclick="changeTab('favorite', document.querySelectorAll('.tab-item')[3])" class="dock-item p-3 text-white/40"><i class="fa fa-bookmark text-lg"></i></button>
-        <button onclick="toggleModal('profileModal')" class="dock-item p-3 text-white/40"><i class="fa fa-user text-lg"></i></button>
-    </div>
-
-    <!-- Profile/Auth Modal -->
-    <div id="loginModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-6 bg-black/80 backdrop-blur-2xl transition-opacity">
-        <div class="glass-ultra w-full max-w-xs p-8 rounded-[30px] text-center reveal-item is-visible border border-white/10">
-            <div class="w-16 h-16 bg-[var(--accent)]/10 text-[var(--accent)] rounded-full flex items-center justify-center mx-auto mb-4 border border-[var(--accent)]/20">
-                <i class="fa fa-shield-halved text-2xl"></i>
+    <!-- Modal -->
+    <div id="video-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="app.closeModal('video-modal')"></div>
+        <div class="glass w-full max-w-4xl rounded-2xl relative z-10 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <h3 class="text-xl font-bold" id="modal-title">Tambah Video</h3>
+                <button onclick="app.closeModal('video-modal')" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <h2 class="text-lg font-bold mb-1 uppercase tracking-wider">System Access</h2>
-            <p class="text-[10px] text-white/40 mb-6 px-4">Developer Override Protocol</p>
-            
-            <form id="loginForm" class="space-y-4">
-                <div class="input-group">
-                    <input type="password" id="adminPin" placeholder="PIN" class="text-center tracking-[1em] text-lg font-bold" required>
-                </div>
-                <button type="submit" class="w-full py-3 bg-[var(--accent)] rounded-xl font-bold text-xs uppercase shadow-lg shadow-[var(--accent-glow)] active:scale-95 transition hover:brightness-110">VERIFY</button>
-                <button type="button" onclick="logoutAdmin()" id="logoutBtn" class="hidden w-full py-3 bg-red-500/10 text-red-500 rounded-xl font-bold text-xs uppercase border border-red-500/20 active:scale-95 transition">REVOKE ACCESS</button>
-                <button type="button" onclick="toggleModal('loginModal')" class="w-full py-2 text-white/30 hover:text-white font-bold text-[10px] uppercase tracking-widest transition">CLOSE</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Upload Modal -->
-    <div id="uploadModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-xl transition-opacity">
-        <div class="glass-ultra w-full max-w-md p-6 rounded-[30px] border border-white/10 shadow-2xl reveal-item is-visible max-h-[90vh] overflow-y-auto no-scrollbar">
-            <div class="flex justify-between items-center mb-6 sticky top-0 bg-[#0a0a0a]/80 backdrop-blur-md py-2 z-10">
-                <h2 id="modalHeadTitle" class="text-xl font-bold italic uppercase tracking-tighter">Post <span class="text-[var(--accent)]">Video</span></h2>
-                <button onclick="toggleModal('uploadModal')" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10"><i class="fa fa-times"></i></button>
-            </div>
-            <form id="movieForm" class="space-y-4">
-                <input type="hidden" id="editId">
-                <div class="input-group">
-                    <input type="text" id="upTitle" placeholder="Judul Konten" required>
-                </div>
-                <div class="input-group">
-                    <select id="upCategory" required>
-                        <option value="" disabled selected>Pilih Kategori</option>
-                        <option value="Anime">Anime</option>
-                        <option value="Film">Film</option>
-                        <option value="Musik">Musik</option>
-                        <option value="Viral">Viral</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <input type="url" id="upLink" placeholder="Video Link (.mp4)" required>
-                </div>
-                <div class="input-group">
-                    <input type="url" id="upThumb" placeholder="Thumbnail URL" required>
-                </div>
-                <button type="submit" id="submitBtn" class="w-full py-3 bg-[var(--accent)] rounded-xl font-bold text-xs uppercase shadow-xl shadow-[var(--accent-glow)] transition active:scale-95 mt-2">PUBLISH</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Video Modal Player -->
-    <div id="videoModal" class="fixed inset-0 z-[3000] hidden bg-[#050505] flex-col items-center justify-start overflow-y-auto no-scrollbar pb-24 transition-opacity" data-lenis-prevent>
-        <div class="w-full max-w-4xl flex flex-col transition-all duration-500" id="videoWrapper">
-            
-            <!-- Video Header -->
-            <div class="video-surroundings flex justify-between items-center bg-black/80 p-4 backdrop-blur-2xl sticky top-0 z-50 border-b border-white/5">
-                <div class="flex items-center gap-3 overflow-hidden">
-                    <button onclick="closePlayer()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/70 active:scale-90"><i class="fa fa-chevron-down"></i></button>
-                    <h4 id="playingTitle" class="font-bold truncate text-sm italic w-full pr-4 text-white/90"></h4>
-                </div>
-                <div class="flex gap-2 shrink-0">
-                    <button onclick="toggleCinematic()" class="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center text-white/50 hover:text-white" title="Cinematic Mode"><i class="fa fa-lightbulb"></i></button>
-                </div>
-            </div>
-            
-            <!-- Player Area -->
-            <div class="relative w-full aspect-video bg-black group video-focus shadow-2xl" id="playerContainer">
-                <div id="playerLoading" class="absolute inset-0 flex items-center justify-center bg-black z-0">
-                    <i class="fa fa-circle-notch fa-spin text-[var(--accent)] text-3xl"></i>
-                </div>
-                <video id="mainPlayer" class="w-full h-full object-contain relative z-10" controls playsinline></video>
-                <!-- Double tap reaction overlay -->
-                <div id="doubleTapOverlay" class="absolute inset-0 z-20 cursor-pointer"></div>
-                <i class="fa fa-heart floating-heart" id="bigHeart"></i>
-                
-                <!-- Quick Emojis overlay -->
-                <div class="absolute bottom-16 right-4 z-30 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity video-surroundings">
-                    <button onclick="sendReaction('🔥')" class="text-xl hover:scale-125 transition">🔥</button>
-                    <button onclick="sendReaction('😂')" class="text-xl hover:scale-125 transition">😂</button>
-                    <button onclick="sendReaction('😍')" class="text-xl hover:scale-125 transition">😍</button>
-                </div>
-            </div>
-
-            <!-- Controls & Stats -->
-            <div class="video-surroundings flex justify-between items-center px-4 py-4 border-b border-white/5">
-                <div class="flex gap-4 items-center">
-                    <button onclick="toggleLikeCurrent()" class="flex items-center gap-2 group">
-                        <i class="fa fa-heart text-xl text-white/30 transition-all group-active:scale-75" id="modalLikeHeart"></i>
-                        <span id="modalLikeCount" class="text-sm font-bold num-animate">0</span>
-                    </button>
-                    <div class="flex items-center gap-2 text-white/50">
-                        <i class="fa fa-eye text-lg"></i>
-                        <span id="modalViewCount" class="text-sm font-bold num-animate">0</span>
+            <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form id="video-form" class="space-y-4">
+                    <input type="hidden" id="form-id">
+                    <div class="space-y-1">
+                        <label class="text-sm text-gray-400">Judul Video</label>
+                        <input type="text" id="form-title" oninput="app.livePreview()" required class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-brand focus:outline-none">
                     </div>
-                </div>
-                
-                <div class="flex gap-2">
-                    <button onclick="toggleSaveCurrent()" id="btnSave" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 active:scale-90 transition"><i class="fa fa-bookmark"></i></button>
-                    <button onclick="requestPiP()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 active:scale-90 transition hidden md:flex"><i class="fa fa-clone"></i></button>
-                    <button onclick="toggleShareMenu()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-emerald-400 active:scale-90 transition relative">
-                        <i class="fa fa-share-nodes"></i>
-                        <!-- Share Dropdown -->
-                        <div id="shareDropdown" class="hidden absolute top-12 right-0 bg-[#111] border border-white/10 rounded-xl p-2 flex flex-col gap-1 w-36 z-[100] shadow-2xl text-left">
-                            <div onclick="shareTo('whatsapp')" class="px-3 py-2 text-xs hover:bg-white/5 rounded-lg flex items-center gap-2 text-white"><i class="fab fa-whatsapp text-green-500"></i> WhatsApp</div>
-                            <div onclick="shareTo('telegram')" class="px-3 py-2 text-xs hover:bg-white/5 rounded-lg flex items-center gap-2 text-white"><i class="fab fa-telegram text-blue-400"></i> Telegram</div>
-                            <div onclick="shareTo('copy')" class="px-3 py-2 text-xs hover:bg-white/5 rounded-lg flex items-center gap-2 text-white"><i class="fa fa-link text-white/50"></i> Copy Link</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Recommendations (Smart Feature) -->
-            <div class="video-surroundings px-4 py-4 border-b border-white/5">
-                <h3 class="text-xs font-bold uppercase text-white/50 mb-3 tracking-widest">Direkomendasikan</h3>
-                <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2" id="recommendationList">
-                    <!-- Dynamic recs injected here -->
-                </div>
-            </div>
-
-            <!-- Comments -->
-            <div class="video-surroundings px-4 py-6">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-base font-bold uppercase italic">Komentar</h3>
-                        <span class="px-2 py-0.5 bg-[var(--accent)]/20 text-[var(--accent)] text-[10px] rounded-md font-bold" id="commentCount">0</span>
+                    <div class="space-y-1">
+                        <label class="text-sm text-gray-400">Deskripsi</label>
+                        <textarea id="form-desc" rows="3" required class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-brand focus:outline-none"></textarea>
                     </div>
-                    <select id="commentSort" onchange="loadComments(currentPlayingId)" class="bg-transparent text-white/50 text-xs outline-none cursor-pointer border-none">
-                        <option value="desc">Terbaru</option>
-                        <option value="asc">Terlama</option>
-                    </select>
-                </div>
-                
-                <form id="commentForm" class="flex gap-2 mb-8">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--accent)] to-purple-500 shrink-0 border border-white/10"></div>
-                    <div class="flex-1 bg-white/5 rounded-2xl flex items-center px-4 border border-white/5 focus-within:border-[var(--accent)]/50 transition">
-                        <input type="text" id="commentInput" placeholder="Tambahkan komentar publik..." required class="bg-transparent w-full text-xs py-3 outline-none">
-                        <button type="submit" class="text-[var(--accent)] text-sm active:scale-75 transition ml-2"><i class="fa fa-paper-plane"></i></button>
+                    <div class="space-y-1">
+                        <label class="text-sm text-gray-400">URL Thumbnail</label>
+                        <input type="url" id="form-thumb" oninput="app.livePreview()" required placeholder="https://..." class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-brand focus:outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-sm text-gray-400">URL Google Drive (Link Share)</label>
+                        <input type="url" id="form-url" required placeholder="https://drive.google.com/..." class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-brand focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div><label class="text-xs text-gray-400">Genre</label><input type="text" id="form-genre" required class="w-full bg-dark/50 border border-white/10 rounded-lg p-2 focus:border-brand focus:outline-none"></div>
+                        <div><label class="text-xs text-gray-400">Tahun</label><input type="number" id="form-year" required class="w-full bg-dark/50 border border-white/10 rounded-lg p-2 focus:border-brand focus:outline-none"></div>
+                        <div><label class="text-xs text-gray-400">Rating</label><input type="number" id="form-rating" step="0.1" required class="w-full bg-dark/50 border border-white/10 rounded-lg p-2 focus:border-brand focus:outline-none"></div>
                     </div>
                 </form>
-
-                <div id="commentsList" class="flex flex-col gap-5">
-                    <!-- Comments injected here -->
+                
+                <!-- Real-time Preview Area -->
+                <div class="hidden md:block border-l border-white/10 pl-6">
+                    <p class="text-xs text-gray-500 mb-4 uppercase font-bold tracking-widest">Live Preview</p>
+                    <div class="rounded-xl overflow-hidden bg-dark-card border border-white/5 shadow-2xl">
+                        <img id="preview-img" src="https://via.placeholder.com/400x600?text=Preview" class="w-full aspect-[2/3] object-cover">
+                        <div class="p-4">
+                            <h4 id="preview-title" class="font-bold truncate uppercase tracking-tighter">Judul Video</h4>
+                            <p class="text-brand text-xs font-bold mt-1">REAL-TIME EDITING MODE</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="p-6 border-t border-white/10 flex justify-end gap-3">
+                <button onclick="app.closeModal('video-modal')" class="px-4 py-2 text-gray-400">Batal</button>
+                <button onclick="app.saveVideo()" id="btn-save" class="bg-brand px-6 py-2 rounded-lg font-bold">Simpan Data</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN LOGIC -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, deleteDoc, updateDoc, limit, increment, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Required rule compliance: No DB structure/query modification.
         const firebaseConfig = {
-            apiKey: "AIzaSyBrf7eFkgI9wtzA-to-3DgU75kOhXxD4cE",
-            authDomain: "bokep-nell.firebaseapp.com",
-            projectId: "bokep-nell",
-            storageBucket: "bokep-nell.firebasestorage.app",
-            messagingSenderId: "525720543599",
-            appId: "1:525720543599:web:a428603a8b983b3c04889a"
+            apiKey: "AIzaSyChJUtOEnYGW9iryHYqst2ql-oNDdJyysw",
+            authDomain: "marketplace-ea770.firebaseapp.com",
+            projectId: "marketplace-ea770",
+            storageBucket: "marketplace-ea770.firebasestorage.app",
+            messagingSenderId: "457308432728",
+            appId: "1:457308432728:web:01568ae63de26444105d2d"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const moviesCol = collection(db, "movies");
-        const commentsCol = collection(db, "comments");
+        const ADMIN_EMAIL = "cristiandwih2006@gmail.com";
+        const fbApp = initializeApp(firebaseConfig);
+        const auth = getAuth(fbApp);
+        const db = getFirestore(fbApp);
+        const provider = new GoogleAuthProvider();
 
-        // --- STATE & GLOBAL ---
-        let cachedMovies = [];
-        let currentFilter = 'all';
-        let currentQueryText = '';
-        let isAdmin = localStorage.getItem('isAdmin') === 'true';
-        let likedVideos = JSON.parse(localStorage.getItem('likedVideos') || '[]');
-        let savedVideos = JSON.parse(localStorage.getItem('savedVideos') || '[]');
-        let watchHistory = JSON.parse(localStorage.getItem('watchHistory') || '[]');
-        let localCommentLikes = JSON.parse(localStorage.getItem('localCommentLikes') || '{}');
-        let currentPlayingId = null;
-        let unsubscribeComments = null;
-        let isInitialLoad = true;
-        let cinematicMode = false;
+        window.app = {
+            user: null,
+            isAdmin: false,
+            videos: [],
+            currentView: 'home',
+            heroIndex: 0,
+            heroInterval: null,
+            
+            init() {
+                this.setupAuthListener();
+                this.setupRealtimeDB();
+                this.setupSearch();
+            },
 
-        // PWA Cache API (Offline Cache feature)
-        const initCache = async () => {
-            if('caches' in window) {
-                try {
-                    const cache = await caches.open('viral-static-v1');
-                    await cache.addAll(['https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css']);
-                } catch(e) {}
-            }
-        };
-        initCache();
+            showToast(msg, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `glass border-l-4 ${type === 'error' ? 'border-red-500' : 'border-green-500'} px-5 py-3 rounded-lg shadow-xl toast-enter pointer-events-auto`;
+                toast.innerHTML = `<span class="text-sm font-medium">${msg}</span>`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            },
 
-        // --- UI UTILITIES ---
-        const Toast = Swal.mixin({
-            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
-            background: 'rgba(20,20,20,0.9)', color: '#fff', timerProgressBar: true,
-            customClass: { popup: 'backdrop-blur-md border border-white/10 rounded-2xl' }
-        });
+            login() { signInWithPopup(auth, provider); },
+            logout() { signOut(auth); },
 
-        // Intro Splash Screen
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                splash.style.opacity = '0';
-                setTimeout(() => splash.style.visibility = 'hidden', 800);
-            }, 1000);
-        });
-
-        // Scroll Progress
-        window.onscroll = () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById("scrollProgress").style.width = scrolled + "%";
-        };
-
-        // Live Counter Animation (Number Tweening)
-        const animateValue = (obj, start, end, duration) => {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) window.requestAnimationFrame(step);
-            };
-            window.requestAnimationFrame(step);
-        };
-
-        window.toggleModal = (id) => {
-            const m = document.getElementById(id);
-            if(m.classList.contains('hidden')) {
-                m.classList.remove('hidden'); m.classList.add('flex');
-            } else {
-                m.classList.add('hidden'); m.classList.remove('flex');
-            }
-        };
-
-        window.toggleAuthModal = () => toggleModal('loginModal');
-
-        // Admin & Form Logic
-        document.getElementById('loginForm').onsubmit = (e) => {
-            e.preventDefault();
-            if(document.getElementById('adminPin').value === 'admin123') { 
-                isAdmin = true; localStorage.setItem('isAdmin', 'true');
-                document.body.classList.add('is-admin'); toggleModal('loginModal');
-                Toast.fire({ icon: 'success', title: 'Developer Override Active' });
-            }
-        };
-        window.logoutAdmin = () => { isAdmin = false; localStorage.setItem('isAdmin', 'false'); document.body.classList.remove('is-admin'); toggleModal('loginModal'); };
-        if(isAdmin) document.body.classList.add('is-admin');
-
-        window.openUploadModal = () => { document.getElementById('movieForm').reset(); document.getElementById('editId').value = ""; toggleModal('uploadModal'); };
-
-        document.getElementById('movieForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('editId').value;
-            const p = { title: document.getElementById('upTitle').value, link: document.getElementById('upLink').value, thumb: document.getElementById('upThumb').value, category: document.getElementById('upCategory').value };
-            const btn = document.getElementById('submitBtn'); btn.innerText = 'WAIT...'; btn.disabled = true;
-            try {
-                if(id) await updateDoc(doc(db, "movies", id), p);
-                else { p.createdAt = serverTimestamp(); p.views = 0; p.likes = 0; await addDoc(moviesCol, p); }
-                toggleModal('uploadModal'); Toast.fire({ icon: 'success', title: 'Data Pushed' });
-            } catch(e) {} finally { btn.innerText = 'PUBLISH'; btn.disabled = false; }
-        };
-
-        // --- PERFORMANCE MANAGERS ---
-        const lenis = new Lenis({ duration: 1.2, smooth: true });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
-
-        const animationObserver = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); animationObserver.unobserve(e.target); } });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-        const lazyLoadObserver = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    const img = e.target;
-                    if(img.dataset.src) { img.src = img.dataset.src; img.onload = () => img.classList.add('loaded'); lazyLoadObserver.unobserve(img); }
-                }
-            });
-        }, { rootMargin: '300px' });
-
-        const videoObserver = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                const vid = e.target;
-                if (!e.isIntersecting) { if(!vid.paused) vid.pause(); } 
-                else if(vid.classList.contains('preview-vid') && vid.closest('.movie-card:hover')) vid.play().catch(()=>{});
-            });
-        }, { threshold: 0.3 });
-
-        // Virtualized Smart Preload (Prefetch top 5 images on idle)
-        const smartPreload = (data) => {
-            if('requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    data.slice(0,5).forEach(m => { const img = new Image(); img.src = m.thumb; });
+            setupAuthListener() {
+                onAuthStateChanged(auth, (user) => {
+                    this.user = user;
+                    this.isAdmin = user && user.email === ADMIN_EMAIL;
+                    this.renderAuthUI();
                 });
-            }
-        };
+            },
 
-        // --- RENDER SYSTEM (Infinite Scroll local) ---
-        let renderQueue = [];
-        let renderIndex = 0;
-        const ITEMS_PER_CHUNK = 12;
-        const sentinelEl = document.getElementById('scrollSentinel');
-        
-        const infiniteObserver = new IntersectionObserver((entries) => {
-            if(entries[0].isIntersecting && renderIndex < renderQueue.length) loadNextChunk();
-        }, { rootMargin: '400px' });
+            renderAuthUI() {
+                const desktopAuth = document.getElementById('auth-section');
+                const mobileAuthBtn = document.getElementById('mobile-auth-btn');
+                const adminMenuDesktop = document.getElementById('admin-menu-section');
+                const adminMenuMobile = document.getElementById('mobile-admin-btn');
 
-        const resetScrollSystem = (data) => {
-            renderQueue = data; renderIndex = 0;
-            const grid = document.getElementById('movieGrid'); grid.innerHTML = '';
-            infiniteObserver.disconnect(); sentinelEl.classList.add('hidden');
-            if(data.length === 0) { grid.innerHTML = `<div class="col-span-full py-20 text-center text-white/30 text-xs italic">Kosong / Tidak ditemukan</div>`; return; }
-            loadNextChunk();
-        };
-
-        const loadNextChunk = () => {
-            sentinelEl.classList.remove('hidden');
-            sentinelEl.innerHTML = '<i class="fa fa-circle-notch fa-spin text-[var(--accent)] text-xl"></i>';
-            requestAnimationFrame(() => {
-                const grid = document.getElementById('movieGrid');
-                const chunk = renderQueue.slice(renderIndex, renderIndex + ITEMS_PER_CHUNK);
-                chunk.forEach((m) => {
-                    const card = createMovieCard(m);
-                    grid.appendChild(card);
-                    animationObserver.observe(card);
-                    lazyLoadObserver.observe(card.querySelector('.img-lazy'));
-                });
-                renderIndex += ITEMS_PER_CHUNK;
-                if(renderIndex < renderQueue.length) infiniteObserver.observe(sentinelEl);
-                else sentinelEl.innerHTML = '<p class="text-[9px] text-white/20 uppercase font-bold tracking-[0.3em]">End of List</p>';
-                lenis.resize(); 
-            });
-        };
-
-        const highlightText = (text, q) => q ? text.replace(new RegExp(`(${q})`, "gi"), `<span class="text-[var(--accent)]">$1</span>`) : text;
-
-        const createMovieCard = (m) => {
-            const card = document.createElement('div');
-            card.className = "movie-card reveal-item";
-            const isNew = m.createdAt && (Date.now() - m.createdAt.toMillis() < 86400000);
-            
-            // Smart Feature: AI Tagging (Simple Keyword Extraction)
-            const tags = m.title.split(' ').filter(w => w.length > 3).slice(0,2).map(w => `<span class="ai-tag">${w}</span>`).join('');
-
-            // Feature: Continue Watching progress indicator
-            const savedTime = localStorage.getItem('progress_' + m.id);
-            const progressBadge = savedTime ? `<div class="absolute top-3 left-3 z-30 bg-blue-500/80 backdrop-blur text-white text-[8px] font-bold px-2 py-1 rounded shadow-lg"><i class="fa fa-clock"></i> Lanjut</div>` : '';
-
-            card.innerHTML = `
-                ${isNew && !savedTime ? '<div class="badge-premium">NEW</div>' : progressBadge}
-                
-                <img data-src="${m.thumb}" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCA0NSI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMTExIi8+PC9zdmc+" class="img-lazy w-full aspect-[3/4.5] object-cover" alt="${m.title}">
-                
-                <div class="preview-box" id="pv-${m.id}"></div>
-                <div class="preview-progress" id="pprog-${m.id}"></div>
-                
-                <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent p-4 flex flex-col justify-end z-[15]">
-                    <h3 class="text-xs font-bold truncate uppercase mb-1 drop-shadow-md">${highlightText(m.title, currentQueryText)}</h3>
-                    <div class="flex items-center gap-1 mb-2">${tags}</div>
-                    <div class="flex items-center gap-3 text-[9px] text-white/50 font-black">
-                        <span><i class="fa fa-play text-[var(--accent)] mr-1"></i>${m.views || 0}</span>
-                        <span><i class="fa fa-heart ${likedVideos.includes(m.id)?'text-red-500':'text-white/30'} mr-1"></i>${m.likes || 0}</span>
-                    </div>
-                </div>
-            `;
-            
-            let hoverTimeout;
-            card.onmouseenter = () => {
-                hoverTimeout = setTimeout(() => {
-                    const box = card.querySelector('.preview-box');
-                    let vid = box.querySelector('video');
-                    if(!vid) {
-                        box.innerHTML = `<video src="${m.link}" class="preview-vid" muted playsinline loop preload="none"></video>`;
-                        vid = box.querySelector('video');
-                        videoObserver.observe(vid);
-                        
-                        // Video progress bar for preview
-                        vid.addEventListener('timeupdate', () => {
-                            const pbar = card.querySelector('.preview-progress');
-                            if(vid.duration) pbar.style.width = (vid.currentTime / vid.duration) * 100 + '%';
-                        });
-                        vid.play().catch(()=>{});
-                    } else vid.play().catch(()=>{});
-                }, 400); // 400ms delay before preview
-            };
-            card.onmouseleave = () => {
-                clearTimeout(hoverTimeout);
-                const vid = card.querySelector('video');
-                if(vid) vid.pause();
-                const pbar = card.querySelector('.preview-progress');
-                if(pbar) pbar.style.width = '0%';
-            };
-            
-            card.onclick = () => window.playVideo(m.id);
-            return card;
-        };
-
-        // --- FILTER & TABS ---
-        const executeFilter = () => {
-            let data = [...cachedMovies];
-            
-            // Smart Feature: Personalized Feed
-            if (currentFilter === 'all') {
-                if (watchHistory.length > 0) {
-                    // Extract favorite categories from history
-                    const catCounts = watchHistory.reduce((acc, v) => { acc[v.category] = (acc[v.category] || 0) + 1; return acc; }, {});
-                    const topCat = Object.keys(catCounts).sort((a,b)=>catCounts[b]-catCounts[a])[0];
-                    // Boost videos matching top category
-                    data.sort((a,b) => (a.category === topCat ? -1 : 1) - (b.category === topCat ? -1 : 1));
-                }
-            } 
-            else if (currentFilter === 'history') data = watchHistory;
-            else if (currentFilter === 'favorite') data = data.filter(m => savedVideos.includes(m.id));
-            else if (currentFilter === 'trending') data = data.sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,20);
-            else data = data.filter(m => m.category === currentFilter);
-            
-            if(currentQueryText) {
-                const q = currentQueryText.toLowerCase();
-                data = data.filter(m => m.title.toLowerCase().includes(q));
-            }
-            
-            document.getElementById('videoCount').innerText = `${data.length} CONTENT`;
-            resetScrollSystem(data);
-        };
-
-        window.changeTab = (cat, el) => {
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            if(el) el.classList.add('active');
-            currentFilter = cat;
-            const tMap = { 'all': 'For You', 'history': 'Continue Watching', 'favorite': 'Saved Collection', 'trending': 'Trending Now' };
-            document.getElementById('tabTitle').innerText = tMap[cat] || cat;
-            window.scrollTo({top: document.getElementById('tabContainer').offsetTop - 80, behavior: 'smooth'});
-            executeFilter();
-        };
-
-        document.getElementById('searchInput').oninput = (e) => {
-            currentQueryText = e.target.value; setTimeout(executeFilter, 300);
-        };
-
-        // --- HERO CTA ---
-        const renderSlider = () => {
-            const slider = document.getElementById('heroSlider');
-            if(cachedMovies.length === 0) return;
-            slider.innerHTML = '';
-            cachedMovies.slice(0, 4).forEach((m, i) => {
-                const div = document.createElement('div');
-                div.className = `slide ${i === 0 ? 'active' : ''}`;
-                div.innerHTML = `
-                    <img src="${m.thumb}" class="w-full h-full object-cover brightness-[0.4]">
-                    <div class="absolute inset-0 hero-overlay"></div>
-                    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 z-10">
-                        <span class="px-2 py-1 bg-white/10 backdrop-blur-md rounded border border-white/5 text-[8px] font-black uppercase tracking-[0.2em] w-max mb-3">${m.category}</span>
-                        <h2 class="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-none mb-4 drop-shadow-2xl">${m.title}</h2>
-                        <button onclick="window.playVideo('${m.id}')" class="bg-[var(--accent)] text-white px-6 py-3 w-max rounded-xl font-bold text-xs shadow-lg shadow-[var(--accent-glow)] active:scale-95 transition"><i class="fa fa-play mr-2"></i>WATCH NOW</button>
-                    </div>`;
-                slider.appendChild(div);
-            });
-        };
-        setInterval(() => {
-            const slides = document.querySelectorAll('.slide');
-            if(slides.length < 2) return;
-            let act = [...slides].findIndex(s => s.classList.contains('active'));
-            slides[act].classList.remove('active');
-            slides[(act + 1) % slides.length].classList.add('active');
-        }, 5000);
-
-        // --- PLAYBACK SYSTEM ---
-        const vp = document.getElementById('mainPlayer');
-        
-        window.playVideo = (id) => {
-            let m = cachedMovies.find(v => v.id === id) || watchHistory.find(v => v.id === id);
-            if(!m) return;
-            currentPlayingId = id;
-            
-            // UI setup
-            document.getElementById('playingTitle').innerText = m.title;
-            animateValue(document.getElementById('modalViewCount'), 0, m.views || 0, 1000);
-            animateValue(document.getElementById('modalLikeCount'), 0, m.likes || 0, 1000);
-            document.getElementById('playerLoading').style.display = 'flex';
-            
-            // Buttons State
-            document.getElementById('modalLikeHeart').className = likedVideos.includes(id) ? "fa fa-heart text-xl text-red-500" : "fa fa-heart text-xl text-white/30";
-            document.getElementById('btnSave').style.color = savedVideos.includes(id) ? 'var(--accent)' : 'rgba(255,255,255,0.5)';
-            
-            // Recommendations (Smart Feature)
-            renderRecommendations(m.category, id);
-
-            // Load Video & resume functionality
-            vp.src = m.link;
-            vp.onloadedmetadata = () => {
-                const st = localStorage.getItem('progress_' + id);
-                if(st && parseFloat(st) < vp.duration - 5) vp.currentTime = parseFloat(st);
-            };
-            vp.onplaying = () => document.getElementById('playerLoading').style.display = 'none';
-            vp.play();
-            
-            // Auto Next
-            vp.onended = () => {
-                const list = currentFilter === 'all' ? cachedMovies : renderQueue;
-                const idx = list.findIndex(v => v.id === id);
-                if(idx > -1 && idx < list.length - 1) setTimeout(() => playVideo(list[idx+1].id), 1000);
-            };
-
-            // Save Progress
-            vp.ontimeupdate = () => { if(vp.currentTime > 5) localStorage.setItem('progress_' + id, vp.currentTime); };
-
-            toggleModal('videoModal');
-            
-            // DB non-blocking updates
-            updateDoc(doc(db, "movies", id), { views: increment(1) }).catch(()=>{});
-            
-            // History Sync
-            watchHistory = watchHistory.filter(h => h.id !== id);
-            watchHistory.unshift({...m, id});
-            localStorage.setItem('watchHistory', JSON.stringify(watchHistory.slice(0, 40)));
-            
-            loadComments(id);
-        };
-
-        window.closePlayer = () => { vp.pause(); vp.src = ""; currentPlayingId = null; if(unsubscribeComments) unsubscribeComments(); toggleModal('videoModal'); if(cinematicMode) toggleCinematic(); executeFilter(); /* refresh progress */};
-
-        // --- INTERACTION & UX ---
-        
-        // Double Tap Like
-        let lastTap = 0;
-        document.getElementById('doubleTapOverlay').addEventListener('click', (e) => {
-            const now = new Date().getTime();
-            if(now - lastTap < 300) {
-                // Double tap detected
-                toggleLikeCurrent(true);
-                const heart = document.getElementById('bigHeart');
-                heart.classList.remove('animate-pop');
-                void heart.offsetWidth; // trigger reflow
-                heart.classList.add('animate-pop');
-            } else {
-                // Single tap - toggle play/pause
-                if(vp.paused) vp.play(); else vp.pause();
-            }
-            lastTap = now;
-        });
-
-        // Quick Reaction
-        window.sendReaction = (emoji) => {
-            const btn = event.currentTarget;
-            btn.classList.add('animate__animated', 'animate__bounceOutUp');
-            setTimeout(() => btn.classList.remove('animate__animated', 'animate__bounceOutUp'), 1000);
-            Toast.fire({ title: `${emoji} Sent!`, timer: 1000 });
-            // In a real app with modified DB, we'd save this.
-        };
-
-        // Picture-in-Picture & Fullscreen
-        window.requestPiP = async () => { if(document.pictureInPictureEnabled) await vp.requestPictureInPicture(); };
-        vp.addEventListener('dblclick', () => { if(vp.requestFullscreen) vp.requestFullscreen(); });
-
-        window.toggleCinematic = () => {
-            cinematicMode = !cinematicMode;
-            const w = document.getElementById('videoWrapper');
-            if(cinematicMode) w.classList.add('cinematic-active'); else w.classList.remove('cinematic-active');
-        };
-
-        window.toggleLikeCurrent = (forceLike = false) => {
-            if(!currentPlayingId) return;
-            const id = currentPlayingId;
-            const idx = likedVideos.indexOf(id);
-            const heart = document.getElementById('modalLikeHeart');
-            const countEl = document.getElementById('modalLikeCount');
-            let num = parseInt(countEl.innerText);
-            
-            if(idx > -1 && !forceLike) {
-                likedVideos.splice(idx, 1);
-                heart.className = "fa fa-heart text-xl text-white/30 transition-all";
-                countEl.innerText = Math.max(0, num - 1);
-                updateDoc(doc(db, "movies", id), { likes: increment(-1) }).catch(()=>{});
-            } else if(idx === -1) {
-                likedVideos.push(id);
-                heart.className = "fa fa-heart text-xl text-red-500 scale-125 transition-all";
-                setTimeout(()=>heart.classList.remove('scale-125'), 300);
-                countEl.innerText = num + 1;
-                updateDoc(doc(db, "movies", id), { likes: increment(1) }).catch(()=>{});
-            }
-            localStorage.setItem('likedVideos', JSON.stringify(likedVideos));
-        };
-
-        window.toggleSaveCurrent = () => {
-            if(!currentPlayingId) return;
-            const id = currentPlayingId;
-            const idx = savedVideos.indexOf(id);
-            const btn = document.getElementById('btnSave');
-            if(idx > -1) { savedVideos.splice(idx, 1); btn.style.color = 'rgba(255,255,255,0.5)'; Toast.fire({title: 'Dihapus dari Tersimpan', icon: 'info'}); } 
-            else { savedVideos.push(id); btn.style.color = 'var(--accent)'; Toast.fire({title: 'Tersimpan!', icon: 'success'}); }
-            localStorage.setItem('savedVideos', JSON.stringify(savedVideos));
-        };
-
-        window.toggleShareMenu = () => {
-            const d = document.getElementById('shareDropdown');
-            d.classList.toggle('hidden');
-        };
-        window.shareTo = (platform) => {
-            document.getElementById('shareDropdown').classList.add('hidden');
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`Tonton ${document.getElementById('playingTitle').innerText} di VIRAL!`);
-            if(platform === 'whatsapp') window.open(`https://wa.me/?text=${text}%20${url}`);
-            if(platform === 'telegram') window.open(`https://t.me/share/url?url=${url}&text=${text}`);
-            if(platform === 'copy') { navigator.clipboard.writeText(window.location.href); Toast.fire({title:'Link disalin', icon:'success'}); }
-            event.stopPropagation();
-        };
-
-        // Notifications System
-        window.toggleNotifications = () => {
-            const d = document.getElementById('notifDropdown');
-            d.classList.toggle('hidden');
-            document.getElementById('notifDot').style.display = 'none'; // Clear badge
-        };
-
-        // Smart Feature: Recommendations
-        const renderRecommendations = (cat, excludeId) => {
-            const cont = document.getElementById('recommendationList');
-            let recs = cachedMovies.filter(m => m.category === cat && m.id !== excludeId).slice(0, 5);
-            if(recs.length === 0) recs = cachedMovies.filter(m => m.id !== excludeId).slice(0, 5); // Fallback
-            cont.innerHTML = recs.map(m => `
-                <div onclick="playVideo('${m.id}')" class="shrink-0 w-32 rounded-xl overflow-hidden cursor-pointer group border border-white/5 relative">
-                    <img src="${m.thumb}" class="w-full h-20 object-cover group-hover:scale-110 transition duration-300">
-                    <div class="absolute bottom-0 w-full bg-black/60 backdrop-blur-sm p-1">
-                        <p class="text-[8px] truncate font-bold">${m.title}</p>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        // Comments System Upgrade
-        window.loadComments = (videoId) => {
-            const list = document.getElementById('commentsList');
-            const sortOrder = document.getElementById('commentSort').value;
-            list.innerHTML = '<i class="fa fa-circle-notch fa-spin text-white/30 text-center block py-4"></i>';
-            if(unsubscribeComments) unsubscribeComments();
-
-            const q = query(commentsCol, where("videoId", "==", videoId), orderBy("createdAt", sortOrder));
-            unsubscribeComments = onSnapshot(q, (snap) => {
-                document.getElementById('commentCount').innerText = snap.docs.length;
-                list.innerHTML = snap.empty ? '<p class="text-[10px] text-white/30 italic text-center py-4">Jadilah yang pertama berkomentar</p>' : '';
-                snap.docs.forEach(d => {
-                    const c = d.data(); const cid = d.id;
-                    const isLiked = localCommentLikes[cid];
-                    const div = document.createElement('div');
-                    div.className = "flex gap-3 reveal-item is-visible animate__animated animate__fadeIn";
-                    div.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-white/10 flex shrink-0 items-center justify-center font-bold text-white/50 text-xs">${(c.username||'U').charAt(0)}</div>
-                        <div class="flex-1">
-                            <div class="bg-white/5 p-3 rounded-2xl rounded-tl-sm border border-white/5 inline-block min-w-[50%]">
-                                <span class="text-[10px] font-bold text-white/60 block mb-1">@${c.username}</span>
-                                <p class="text-xs text-white/90 leading-relaxed">${c.comment}</p>
-                            </div>
-                            <div class="flex gap-4 mt-1 px-2">
-                                <span class="text-[9px] text-white/30">${c.createdAt ? new Date(c.createdAt.toMillis()).toLocaleDateString() : 'Baru'}</span>
-                                <button onclick="likeComment('${cid}')" class="text-[9px] font-bold ${isLiked?'text-[var(--accent)]':'text-white/40'} hover:text-white transition">Suka</button>
-                                <button onclick="replyComment('${c.username}')" class="text-[9px] font-bold text-white/40 hover:text-white transition">Balas</button>
+                if (this.user) {
+                    desktopAuth.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="${this.user.photoURL}" class="w-8 h-8 rounded-full border border-brand">
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-bold truncate w-24">${this.user.displayName}</p>
+                                <button onclick="app.logout()" class="text-[10px] text-gray-500 hover:text-white">Keluar</button>
                             </div>
                         </div>
                     `;
-                    list.appendChild(div);
+                    mobileAuthBtn.innerHTML = `<img src="${this.user.photoURL}" onclick="app.logout()" class="w-8 h-8 rounded-full border border-brand">`;
+                } else {
+                    desktopAuth.innerHTML = `<button onclick="app.login()" class="w-full bg-white/5 py-3 rounded-xl text-xs font-bold">LOGIN GOOGLE</button>`;
+                    mobileAuthBtn.innerHTML = `<button onclick="app.login()" class="bg-brand px-3 py-1.5 rounded-lg text-xs font-bold">LOGIN</button>`;
+                }
+
+                if (this.isAdmin) {
+                    adminMenuDesktop.classList.remove('hidden');
+                    adminMenuMobile.classList.remove('hidden');
+                    adminMenuMobile.classList.add('flex');
+                } else {
+                    adminMenuDesktop.classList.add('hidden');
+                    adminMenuMobile.classList.add('hidden');
+                }
+            },
+
+            navigate(viewId, payload = null) {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${viewId}`).classList.remove('hidden');
+                this.currentView = viewId;
+
+                if (viewId !== 'detail') document.getElementById('main-player').src = '';
+                if (viewId === 'detail' && payload) this.renderDetail(payload);
+                window.scrollTo(0,0);
+            },
+
+            setupRealtimeDB() {
+                const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
+                onSnapshot(q, (snapshot) => {
+                    this.videos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.renderHome();
+                    if(this.isAdmin) this.renderAdminTable();
                 });
-            });
-        };
+            },
 
-        window.likeComment = (cid) => {
-            localCommentLikes[cid] = !localCommentLikes[cid];
-            localStorage.setItem('localCommentLikes', JSON.stringify(localCommentLikes));
-            loadComments(currentPlayingId); // Simple local re-render
-        };
+            renderHome(filterText = '') {
+                const mainRow = document.getElementById('main-row');
+                const heroContainer = document.getElementById('hero-container');
+                
+                let filtered = this.videos;
+                if (filterText) {
+                    const txt = filterText.toLowerCase();
+                    filtered = this.videos.filter(v => v.title.toLowerCase().includes(txt) || v.genre.toLowerCase().includes(txt));
+                }
 
-        window.replyComment = (uname) => {
-            const inp = document.getElementById('commentInput');
-            inp.value = `@${uname} `; inp.focus();
-        };
+                if (this.videos.length > 0 && !filterText) {
+                    this.startHeroSlider();
+                } else if(this.videos.length === 0) {
+                    heroContainer.innerHTML = `<div class="h-full flex items-center justify-center text-gray-500">Database Kosong. Tambah melalui Admin.</div>`;
+                    mainRow.innerHTML = '';
+                }
 
-        document.getElementById('commentForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('commentInput');
-            if(!input.value.trim() || !currentPlayingId) return;
-            let uname = localStorage.getItem('guestName') || 'User' + Math.floor(Math.random() * 9999);
-            localStorage.setItem('guestName', uname);
-            try { await addDoc(commentsCol, { videoId: currentPlayingId, username: uname, comment: input.value, createdAt: serverTimestamp() }); input.value = ''; } 
-            catch(e) {}
-        };
+                mainRow.innerHTML = filtered.map(vid => `
+                    <div onclick="app.navigate('detail', '${vid.id}')" class="group cursor-pointer fade-in">
+                        <div class="netflix-card netflix-hover aspect-[2/3] bg-dark-card rounded-xl overflow-hidden relative mb-3">
+                            <img src="${vid.thumbnail}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div class="w-12 h-12 bg-brand rounded-full flex items-center justify-center shadow-xl transform scale-75 group-hover:scale-100 transition-transform">
+                                    <i class="fas fa-play ml-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-sm line-clamp-1 group-hover:text-brand transition-colors uppercase tracking-tight">${vid.title}</h3>
+                        <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-500">
+                            <span class="text-brand font-bold">${vid.rating}</span>
+                            <span>•</span>
+                            <span>${vid.year}</span>
+                            <span>•</span>
+                            <span class="truncate">${vid.genre}</span>
+                        </div>
+                    </div>
+                `).join('');
+            },
 
-        // --- FIREBASE REALTIME LISTENER ---
-        onSnapshot(query(moviesCol, orderBy("createdAt", "desc"), limit(100)), (snap) => {
-            const newMovies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            
-            // Realtime Notification check
-            if(!isInitialLoad && newMovies.length > cachedMovies.length) {
-                const diff = newMovies.filter(n => !cachedMovies.some(c => c.id === n.id));
-                if(diff.length > 0) {
-                    const top = diff[0];
-                    Toast.fire({ icon: 'info', title: 'Video Baru: ' + top.title });
-                    document.getElementById('notifDot').style.display = 'block';
-                    document.getElementById('notifList').insertAdjacentHTML('afterbegin', `<div onclick="playVideo('${top.id}')" class="text-xs p-2 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 border border-white/5"><span class="text-[var(--accent)] font-bold">New</span> ${top.title}</div>`);
+            startHeroSlider() {
+                if (this.heroInterval) clearInterval(this.heroInterval);
+                this.renderHeroSlide();
+                this.heroInterval = setInterval(() => {
+                    this.heroIndex = (this.heroIndex + 1) % this.videos.length;
+                    this.renderHeroSlide();
+                }, 8000);
+            },
+
+            renderHeroSlide() {
+                const hero = this.videos[this.heroIndex];
+                if (!hero) return;
+                const container = document.getElementById('hero-container');
+                container.classList.remove('skeleton');
+                container.innerHTML = `
+                    <div class="absolute inset-0 bg-cover bg-center transition-all duration-1000 fade-in" style="background-image: url('${hero.thumbnail}')"></div>
+                    <div class="absolute inset-0 hero-gradient"></div>
+                    <div class="absolute bottom-24 left-5 md:left-10 md:bottom-32 max-w-2xl z-10 fade-in">
+                        <span class="px-2 py-1 bg-brand text-white text-[10px] font-bold rounded uppercase mb-4 inline-block">Featured</span>
+                        <h1 class="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter drop-shadow-2xl">${hero.title}</h1>
+                        <p class="text-gray-300 text-sm md:text-base line-clamp-2 mb-6 max-w-lg">${hero.description}</p>
+                        <div class="flex gap-4">
+                            <button onclick="app.navigate('detail', '${hero.id}')" class="bg-brand text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-brand/30 hover:scale-105 transition-transform">
+                                <i class="fas fa-play"></i> TONTON SEKARANG
+                            </button>
+                        </div>
+                    </div>
+                `;
+            },
+
+            setupSearch() {
+                document.getElementById('search-input').addEventListener('input', (e) => this.renderHome(e.target.value));
+            },
+
+            convertDriveLink(url) {
+                if (url.includes('drive.google.com/file/d/')) {
+                    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) return `https://drive.google.com/file/d/${match[1]}/preview`;
+                }
+                return url;
+            },
+
+            renderDetail(id) {
+                const video = this.videos.find(v => v.id === id);
+                if(!video) return;
+                document.getElementById('detail-thumb').src = video.thumbnail;
+                document.getElementById('detail-title').innerText = video.title;
+                document.getElementById('detail-desc').innerText = video.description;
+                document.getElementById('detail-meta').innerHTML = `<span>${video.year}</span> • <span class="text-brand font-bold">${video.rating}</span> • <span>${video.genre}</span>`;
+                document.getElementById('main-player').src = this.convertDriveLink(video.videoUrl);
+            },
+
+            renderAdminTable() {
+                const tbody = document.getElementById('admin-table-body');
+                document.getElementById('stat-total').innerText = this.videos.length;
+                tbody.innerHTML = this.videos.map(vid => `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="p-4 w-24"><img src="${vid.thumbnail}" class="w-16 h-20 object-cover rounded"></td>
+                        <td class="p-4">
+                            <p class="font-bold text-sm">${vid.title}</p>
+                            <p class="text-xs text-gray-500">${vid.year} • Rating: ${vid.rating}</p>
+                        </td>
+                        <td class="p-4 text-xs">${vid.genre}</td>
+                        <td class="p-4">
+                            <div class="flex gap-2">
+                                <button onclick="app.editVideo('${vid.id}')" class="p-2 bg-blue-500/20 text-blue-500 rounded"><i class="fas fa-edit"></i></button>
+                                <button onclick="app.deleteVideo('${vid.id}')" class="p-2 bg-red-500/20 text-red-500 rounded"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+
+            livePreview() {
+                const title = document.getElementById('form-title').value;
+                const thumb = document.getElementById('form-thumb').value;
+                document.getElementById('preview-title').innerText = title || "Judul Video";
+                if(thumb) document.getElementById('preview-img').src = thumb;
+            },
+
+            openModal(id) {
+                document.getElementById(id).classList.remove('hidden');
+                if(id === 'video-modal') {
+                    document.getElementById('video-form').reset();
+                    document.getElementById('form-id').value = '';
+                    document.getElementById('modal-title').innerText = 'Tambah Video';
+                    this.livePreview();
+                }
+            },
+
+            closeModal(id) { document.getElementById(id).classList.add('hidden'); },
+
+            editVideo(id) {
+                const v = this.videos.find(v => v.id === id);
+                document.getElementById('form-id').value = v.id;
+                document.getElementById('form-title').value = v.title;
+                document.getElementById('form-desc').value = v.description;
+                document.getElementById('form-thumb').value = v.thumbnail;
+                document.getElementById('form-url').value = v.videoUrl;
+                document.getElementById('form-genre').value = v.genre;
+                document.getElementById('form-year').value = v.year;
+                document.getElementById('form-rating').value = v.rating;
+                this.openModal('video-modal');
+                this.livePreview();
+            },
+
+            async saveVideo() {
+                const id = document.getElementById('form-id').value;
+                const data = {
+                    title: document.getElementById('form-title').value,
+                    description: document.getElementById('form-desc').value,
+                    thumbnail: document.getElementById('form-thumb').value,
+                    videoUrl: document.getElementById('form-url').value,
+                    genre: document.getElementById('form-genre').value,
+                    year: parseInt(document.getElementById('form-year').value),
+                    rating: parseFloat(document.getElementById('form-rating').value),
+                    createdAt: id ? this.videos.find(v=>v.id===id).createdAt : Date.now()
+                };
+
+                try {
+                    if (id) await updateDoc(doc(db, "videos", id), data);
+                    else await addDoc(collection(db, "videos"), data);
+                    this.showToast('Data Berhasil Disinkronkan!', 'success');
+                    this.closeModal('video-modal');
+                } catch (e) { this.showToast('Gagal menyimpan', 'error'); }
+            },
+
+            async deleteVideo(id) {
+                if(confirm("Hapus video ini secara permanen dari database?")) {
+                    await deleteDoc(doc(db, "videos", id));
+                    this.showToast('Data Terhapus');
                 }
             }
-            
-            cachedMovies = newMovies;
-            smartPreload(cachedMovies); // Smart performance preload
-            
-            if(isInitialLoad) { renderSlider(); isInitialLoad = false; }
-            executeFilter();
-        });
+        };
 
+        app.init();
     </script>
 </body>
-</html>
-
+            </html>
